@@ -11,5 +11,5 @@ export const defaults: DefaultsMap = {
     integer: 0,
     number: 0,
     object: {},
-    string: ''
+    string: '',
 };

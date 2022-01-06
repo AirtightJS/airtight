@@ -5,12 +5,28 @@ import { Schema } from '../main/schema';
 
 interface Product {
     title: string;
-    price: {
-        value: number;
-        currency: 'gbp' | 'eur' | 'usd';
-    },
+    price: Price,
+    salePrice?: Price,
+    promoCode: string | null,
     tags: string[];
 }
+
+interface Price {
+    value: number;
+    currency: 'gbp' | 'eur' | 'usd';
+}
+
+const PriceSchema: Schema<Price> = {
+    type: 'object',
+    properties: {
+        value: { type: 'integer' },
+        currency: {
+            type: 'string',
+            enum: ['gbp', 'eur', 'usd'],
+            default: 'gbp',
+        },
+    },
+};
 
 const ProductSchema: Schema<Product> = {
     type: 'object',
@@ -19,15 +35,11 @@ const ProductSchema: Schema<Product> = {
             type: 'string',
             default: 'Unknown Product',
         },
-        price: {
-            type: 'object',
-            properties: {
-                value: { type: 'integer' },
-                currency: {
-                    type: 'string',
-                    enum: ['gbp', 'eur', 'usd'],
-                },
-            },
+        price: PriceSchema,
+        salePrice: { ...PriceSchema, optional: true },
+        promoCode: {
+            type: 'string',
+            nullable: true,
         },
         tags: {
             type: 'array',
@@ -47,9 +59,63 @@ describe('decode', () => {
             const product = decode(ProductSchema, {});
             assert.deepStrictEqual(product, {
                 title: 'Unknown Product',
-                price: {},
+                price: {
+                    value: 0,
+                    currency: 'gbp',
+                },
+                promoCode: null,
                 tags: [],
             });
+        });
+
+        it('type coercion', () => {
+            const product = decode(ProductSchema, {
+                title: 42,
+                price: {
+                    value: '42',
+                },
+                promoCode: 42,
+                tags: [42, true, null]
+            });
+            assert.deepStrictEqual(product, {
+                title: '42',
+                price: {
+                    value: 42,
+                    currency: 'gbp'
+                },
+                promoCode: '42',
+                tags: ['42', 'true', ''],
+            });
+        });
+
+        it('use default for invalid values', () => {
+            const price = decode(PriceSchema, {
+                value: 'foo',
+                currency: 'bar',
+            });
+            assert.deepStrictEqual(price, {
+                value: 0,
+                currency: 'gbp',
+            });
+        });
+
+    });
+
+    describe('throw on invalid', () => {
+
+        it('throws on invalid values', () => {
+            try {
+                decode(PriceSchema, {
+                    value: 'foo',
+                    currency: 'bar',
+                }, true);
+            } catch (error: any) {
+                assert.strictEqual(error.name, 'ValidationError');
+                assert.deepStrictEqual(error.details.errors, [
+                    { path: ['value'], message: 'must be integer' },
+                    { path: ['currency'], message: 'must be an allowed value' },
+                ]);
+            }
         });
 
     });

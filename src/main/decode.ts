@@ -38,13 +38,17 @@ function decodeAny<T>(
     path: string[],
     errors: DecodeError[],
 ) {
+    const untypedSchema: any = schema;
     // Null/Undefined
     if (value == null) {
-        if (schema.nullable) {
+        if (untypedSchema.nullable) {
             return null;
         }
+        if (untypedSchema.optional) {
+            return undefined;
+        }
         errors.push({ path, message: 'must not be null' });
-        return defaultValue(schema);
+        value = defaultValue(schema);
     }
     // Any Schema
     if (schema.type === 'any') {
@@ -65,13 +69,13 @@ function decodeAny<T>(
             return value;
         case 'number':
         case 'integer':
-            return decodeNumber(schema, value, path, errors);
+            return decodeNumber(untypedSchema, value, path, errors);
         case 'string':
-            return decodeString(schema, value, path, errors);
+            return decodeString(untypedSchema, value, path, errors);
         case 'object':
-            return decodeObject(schema, value, path, errors);
+            return decodeObject(untypedSchema, value, path, errors);
         case 'array':
-            return decodeArray(schema, value, path, errors);
+            return decodeArray(untypedSchema, value, path, errors);
         default:
             errors.push({ path, message: 'must be a valid data type' });
             return defaultValue(schema);
@@ -112,7 +116,10 @@ function decodeObject<T>(schema: ObjectSchema<T>, value: unknown, path: string[]
     const original: any = value;
     for (const [key, propSchema] of Object.entries(schema.properties)) {
         const value = original[key];
-        result[key] = decodeAny(propSchema as Schema<any>, value, path.concat([key]), errors);
+        const decoded = decodeAny(propSchema as Schema<any>, value, path.concat([key]), errors);
+        if (decoded !== undefined) {
+            result[key] = decoded;
+        }
         propKeys.add(key);
     }
     if (schema.additionalProperties) {
