@@ -41,7 +41,8 @@ export type NumberSchema = {
 export type StringSchema = {
     type: 'string';
     default?: string;
-    pattern?: string;
+    regex?: string;
+    regexFlags?: string;
     enum?: string[];
 } & BaseSchema;
 

@@ -103,7 +103,7 @@ function decodeString(schema: StringSchema, value: unknown, path: string[], erro
         errors.push({ path, message: `must be an allowed value` });
         valid = false;
     }
-    if (schema.pattern != null && new RegExp(schema.pattern).test(str)) {
+    if (schema.regex != null && new RegExp(schema.regex, schema.regexFlags ?? '').test(str)) {
         errors.push({ path, message: `must be in allowed format` });
         valid = false;
     }
