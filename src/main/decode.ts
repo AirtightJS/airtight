@@ -3,7 +3,7 @@ import { Exception } from 'typesafe-exception';
 import { coerce } from './coerce';
 import { defaults } from './defaults';
 import { ArraySchema, NumberSchema, ObjectSchema, Schema, SchemaType, StringSchema } from './schema';
-import { DataType, getType } from './util';
+import { getType } from './util';
 
 export class ValidationError extends Exception<{ errors: DecodeError[] }> {
     status = 400;
@@ -41,11 +41,11 @@ function decodeAny<T>(
     const untypedSchema: any = schema;
     // Null/Undefined
     if (value == null) {
-        if (untypedSchema.nullable) {
-            return null;
-        }
         if (untypedSchema.optional) {
             return undefined;
+        }
+        if (untypedSchema.nullable) {
+            return null;
         }
         errors.push({ path, message: 'must not be null' });
         value = defaultValue(schema);
@@ -55,7 +55,7 @@ function decodeAny<T>(
         return value;
     }
     // Coercion
-    if (!typesMatch(schema.type, getType(value))) {
+    if (schema.type !== getType(value)) {
         const coercedValue = coerce(schema.type, value);
         if (coercedValue === undefined) {
             errors.push({ path, message: `must be ${schema.type}` });
@@ -143,11 +143,9 @@ function decodeArray<T>(schema: ArraySchema<T>, value: unknown, path: string[], 
     return result;
 }
 
-function typesMatch(schemaType: SchemaType, dataType: DataType) {
-    return schemaType === dataType ||
-        (schemaType === 'integer' && dataType === 'number');
-}
-
-function defaultValue(schema: { type: SchemaType, default?: any }) {
-    return schema.default ?? defaults[schema.type];
+function defaultValue(schema: { type: SchemaType, default?: any, optional?: true, nullable?: true }) {
+    return schema.default ?? (
+        schema.optional ? undefined :
+            schema.nullable ? null :
+                defaults[schema.type]);
 }
