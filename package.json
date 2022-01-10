@@ -22,7 +22,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com/inca/tight-schema.git"
+        "url": "git+ssh://git@github.com/inca/airtight.git"
     },
     "keywords": [
         "schema",
