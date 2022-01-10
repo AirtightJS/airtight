@@ -2,6 +2,7 @@ import assert from 'assert';
 
 import { decode } from '../main/decode';
 import { Schema } from '../main/schema';
+import { SchemaStore } from '../main/store';
 
 describe('schema', () => {
 
@@ -149,6 +150,91 @@ describe('schema', () => {
                 });
             });
         });
+    });
+
+    describe('type: ref', () => {
+
+        context('simple recursion', () => {
+            interface Node {
+                data: string;
+                children: Node[];
+            }
+
+            const schema: Schema<Node> = {
+                id: 'Node',
+                type: 'object',
+                properties: {
+                    data: { type: 'string' },
+                    children: {
+                        type: 'array',
+                        items: { type: 'ref', schemaId: 'Node' },
+                    }
+                }
+            };
+
+            it('decodes recursive objects', () => {
+                const decoded = decode(schema, {
+                    data: 'foo',
+                    children: [
+                        { data: 'bar' },
+                        {
+                            data: 'baz',
+                            children: [
+                                { data: 'fuz' },
+                            ]
+                        },
+                    ]
+                });
+                assert.deepStrictEqual(decoded, {
+                    data: 'foo',
+                    children: [
+                        {
+                            data: 'bar',
+                            children: [],
+                        },
+                        {
+                            data: 'baz',
+                            children: [
+                                {
+                                    data: 'fuz',
+                                    children: [],
+                                },
+                            ]
+                        },
+                    ]
+                });
+            });
+        });
+
+        context('mutual recursion', () => {
+
+            interface Foo { bar?: Bar }
+            interface Bar { foo?: Foo }
+
+            const store = new SchemaStore();
+            const FooSchema = store.declare<Foo>({
+                id: 'Foo',
+                type: 'object',
+                properties: {
+                    bar: { type: 'ref', schemaId: 'Bar', optional: true, },
+                }
+            });
+
+            store.declare<Bar>({
+                id: 'Bar',
+                type: 'object',
+                properties: {
+                    foo: { type: 'ref', schemaId: 'Foo', optional: true, },
+                }
+            });
+
+            it('decodes with external references using schema store', () => {
+                const decoded = FooSchema.decode({ bar: { foo: { bar: {} } } });
+                assert.deepStrictEqual(decoded, { bar: { foo: { bar: {} } } });
+            });
+
+        });
+
     });
 
 });

@@ -2,7 +2,8 @@ import { Exception } from 'typesafe-exception';
 
 import { coerce } from './coerce';
 import { defaults } from './defaults';
-import { ArraySchema, NumberSchema, ObjectSchema, Schema, SchemaType, StringSchema } from './schema';
+import { ArraySchema, NumberSchema, ObjectSchema, Schema, SchemaLike, SchemaType, StringSchema } from './schema';
+import { SchemaStore } from './store';
 import { getType } from './util';
 
 export class ValidationError extends Exception<{ errors: DecodeError[] }> {
@@ -20,6 +21,7 @@ export interface DecodeError {
 
 export interface DecodeOptions {
     throw?: boolean;
+    refs?: SchemaLike[];
 }
 
 export function decode<T>(schema: Schema<T>, value: unknown, options: DecodeOptions = {}): T {
@@ -27,10 +29,12 @@ export function decode<T>(schema: Schema<T>, value: unknown, options: DecodeOpti
 }
 
 export class Decoder<T> {
-    readonly baseSchema: Schema<T>;
+    readonly schema: Schema<T>;
+    readonly store: SchemaStore;
 
-    constructor(schema: Schema<T>) {
-        this.baseSchema = schema;
+    constructor(schema: Schema<T>, store?: SchemaStore) {
+        this.schema = schema;
+        this.store = store ?? new SchemaStore().add(schema);
     }
 
     decode(value: unknown, options: DecodeOptions = {}): T {
@@ -49,7 +53,7 @@ class DecodeJob<T> {
     ) {}
 
     decode(): T {
-        const res = this.decodeAny(this.decoder.baseSchema, this.value, []);
+        const res = this.decodeAny(this.decoder.schema, this.value, []);
         if (this.options.throw && this.errors.length > 0) {
             throw new ValidationError(this.errors);
         }
@@ -72,6 +76,10 @@ class DecodeJob<T> {
         // Any Schema
         if (schema.type === 'any') {
             return value;
+        }
+        // Ref Schema
+        if (schema.type === 'ref') {
+            return this.decodeRef(schema.schemaId, value, path);
         }
         // Coercion
         if (schema.type !== getType(value)) {
@@ -161,6 +169,15 @@ class DecodeJob<T> {
             result.push(item);
         }
         return result;
+    }
+
+    decodeRef(schemaId: string, value: unknown, path: string[]): any {
+        const refSchema = this.decoder.store.get(schemaId);
+        if (!refSchema) {
+            this.errors.push({ path, message: `unknown type ${schemaId}` });
+            return undefined;
+        }
+        return this.decodeAny(refSchema as Schema<any>, value, path);
     }
 
     defaultValue(schema: { type: SchemaType; default?: any; optional?: true; nullable?: true }) {

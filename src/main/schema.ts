@@ -4,6 +4,10 @@ export type Schema<T> = (StrictTypeSchema<T> | AnySchema | RefSchema)
 
 export type SchemaType = Schema<any>['type'];
 
+export type SchemaLike = RefSchema | {
+    type: SchemaType;
+} & BaseSchema;
+
 export type StrictTypeSchema<T> = (
     T extends boolean ? BooleanSchema :
     T extends number ? NumberSchema :
