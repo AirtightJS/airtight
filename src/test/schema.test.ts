@@ -54,9 +54,9 @@ describe('schema', () => {
 
         context('simple properties', () => {
             type T = {
-                foo: string,
-                bar: number,
-                baz: boolean,
+                foo: string;
+                bar: number;
+                baz: boolean;
             };
             const schema: Schema<T> = {
                 type: 'object',
@@ -90,10 +90,10 @@ describe('schema', () => {
 
         context('nested objects', () => {
             type T = {
-                prop: string,
+                prop: string;
                 obj: {
-                    foo: string,
-                }
+                    foo: string;
+                };
             };
             const schema: Schema<T> = {
                 type: 'object',
@@ -120,9 +120,9 @@ describe('schema', () => {
 
         context('nullable, optional', () => {
             type T = {
-                foo?: string,
-                bar: string | null,
-                baz?: string | null,
+                foo?: string;
+                bar: string | null;
+                baz?: string | null;
             };
             const schema: Schema<T> = {
                 type: 'object',

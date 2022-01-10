@@ -5,9 +5,9 @@ import { Schema } from '../main/schema';
 
 interface Product {
     title: string;
-    price: Price,
-    salePrice?: Price,
-    promoCode: string | null,
+    price: Price;
+    salePrice?: Price;
+    promoCode: string | null;
     tags: string[];
 }
 
@@ -108,7 +108,7 @@ describe('decode', () => {
                 decode(PriceSchema, {
                     value: 'foo',
                     currency: 'bar',
-                }, true);
+                }, { throw: true });
             } catch (error: any) {
                 assert.strictEqual(error.name, 'ValidationError');
                 assert.deepStrictEqual(error.details.errors, [

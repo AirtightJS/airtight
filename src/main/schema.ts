@@ -1,4 +1,4 @@
-export type Schema<T> = (StrictTypeSchema<T> | AnySchema)
+export type Schema<T> = (StrictTypeSchema<T> | AnySchema | RefSchema)
     & (undefined extends T ? { optional: true } : {})
     & (null extends T ? { nullable: true } : {});
 
@@ -13,18 +13,22 @@ export type StrictTypeSchema<T> = (
     never
 );
 
-export type ReferenceSchema = { reference: string };
-
 export type BaseSchema = {
     id?: string;
     title?: string;
     description?: string;
-}
+    metadata?: any;
+};
 
 export type AnySchema = {
-    type: 'any',
-    default?: any,
+    type: 'any';
+    default?: any;
 } & BaseSchema;
+
+export type RefSchema = {
+    type: 'ref';
+    schemaId: string;
+};
 
 export type BooleanSchema = {
     type: 'boolean';
@@ -61,4 +65,4 @@ export type ArraySchema<T> = {
 
 export type PropertiesSpec<T> = {
     [K in keyof T]-?: Schema<T[K]>;
-}
+};

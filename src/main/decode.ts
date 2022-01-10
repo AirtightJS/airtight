@@ -13,139 +13,161 @@ export class ValidationError extends Exception<{ errors: DecodeError[] }> {
     }
 }
 
-export interface DecodeResult<T> {
-    value: T;
-    errors: DecodeError[];
-}
-
 export interface DecodeError {
     path: string[];
     message: string;
 }
 
-export function decode<T>(schema: Schema<T>, value: unknown, throwOnInvalid = false): T {
-    const errors: DecodeError[] = [];
-    const res = decodeAny(schema, value, [], errors);
-    if (throwOnInvalid && errors.length > 0) {
-        throw new ValidationError(errors);
-    }
-    return res;
+export interface DecodeOptions {
+    throw?: boolean;
 }
 
-function decodeAny<T>(
-    schema: Schema<T>,
-    value: unknown,
-    path: string[],
-    errors: DecodeError[],
-) {
-    const untypedSchema: any = schema;
-    // Null/Undefined
-    if (value == null) {
-        if (untypedSchema.optional) {
-            return undefined;
-        }
-        if (untypedSchema.nullable) {
-            return null;
-        }
-        errors.push({ path, message: 'must not be null' });
-        value = defaultValue(schema);
-    }
-    // Any Schema
-    if (schema.type === 'any') {
-        return value;
-    }
-    // Coercion
-    if (schema.type !== getType(value)) {
-        const coercedValue = coerce(schema.type, value);
-        if (coercedValue === undefined) {
-            errors.push({ path, message: `must be ${schema.type}` });
-            return defaultValue(schema);
-        }
-        value = coercedValue;
-    }
-    // Per-type
-    switch (schema.type) {
-        case 'boolean':
-            return value;
-        case 'number':
-        case 'integer':
-            return decodeNumber(untypedSchema, value, path, errors);
-        case 'string':
-            return decodeString(untypedSchema, value, path, errors);
-        case 'object':
-            return decodeObject(untypedSchema, value, path, errors);
-        case 'array':
-            return decodeArray(untypedSchema, value, path, errors);
-        default:
-            errors.push({ path, message: 'must be a valid data type' });
-            return defaultValue(schema);
-    }
+export function decode<T>(schema: Schema<T>, value: unknown, options: DecodeOptions = {}): T {
+    return new Decoder(schema).decode(value, options);
 }
 
-function decodeNumber(schema: NumberSchema, value: unknown, path: string[], errors: DecodeError[]): number {
-    const num = value as number;
-    let valid = true;
-    if (schema.minimum != null && num < schema.minimum) {
-        errors.push({ path, message: `must be greater than or equal to ${schema.minimum}` });
-        valid = false;
+export class Decoder<T> {
+    readonly baseSchema: Schema<T>;
+
+    constructor(schema: Schema<T>) {
+        this.baseSchema = schema;
     }
-    if (schema.maximum != null && num > schema.maximum) {
-        errors.push({ path, message: `must be less than or equal to ${schema.maximum}` });
-        valid = false;
+
+    decode(value: unknown, options: DecodeOptions = {}): T {
+        return new DecodeJob(this, value, options).decode();
     }
-    return valid ? num : defaultValue(schema);
+
 }
 
-function decodeString(schema: StringSchema, value: unknown, path: string[], errors: DecodeError[]): string {
-    const str = value as string;
-    let valid = true;
-    if (schema.enum != null && !schema.enum.includes(str)) {
-        errors.push({ path, message: `must be an allowed value` });
-        valid = false;
-    }
-    if (schema.regex != null && new RegExp(schema.regex, schema.regexFlags ?? '').test(str)) {
-        errors.push({ path, message: `must be in allowed format` });
-        valid = false;
-    }
-    return valid ? str : defaultValue(schema);
-}
+class DecodeJob<T> {
+    errors: DecodeError[] = [];
 
-function decodeObject<T>(schema: ObjectSchema<T>, value: unknown, path: string[], errors: DecodeError[]) {
-    const propKeys = new Set<string>();
-    const result: any = {};
-    const original: any = value;
-    for (const [key, propSchema] of Object.entries(schema.properties)) {
-        const value = original[key];
-        const decoded = decodeAny(propSchema as Schema<any>, value, path.concat([key]), errors);
-        if (decoded !== undefined) {
-            result[key] = decoded;
+    constructor(
+        readonly decoder: Decoder<T>,
+        readonly value: unknown,
+        readonly options: DecodeOptions,
+    ) {}
+
+    decode(): T {
+        const res = this.decodeAny(this.decoder.baseSchema, this.value, []);
+        if (this.options.throw && this.errors.length > 0) {
+            throw new ValidationError(this.errors);
         }
-        propKeys.add(key);
+        return res;
     }
-    if (schema.additionalProperties) {
-        for (const [key, value] of original) {
-            if (propKeys.has(key)) {
-                continue;
+
+    protected decodeAny<T>(schema: Schema<T>, value: unknown, path: string[]) {
+        const untypedSchema: any = schema;
+        // Null/Undefined
+        if (value == null) {
+            if (untypedSchema.optional) {
+                return undefined;
             }
-            result[key] = decodeAny(schema.additionalProperties, value, path.concat([key]), errors);
+            if (untypedSchema.nullable) {
+                return null;
+            }
+            this.errors.push({ path, message: 'must not be null' });
+            value = this.defaultValue(schema);
+        }
+        // Any Schema
+        if (schema.type === 'any') {
+            return value;
+        }
+        // Coercion
+        if (schema.type !== getType(value)) {
+            const coercedValue = coerce(schema.type, value);
+            if (coercedValue === undefined) {
+                this.errors.push({ path, message: `must be ${schema.type}` });
+                return this.defaultValue(schema);
+            }
+            value = coercedValue;
+        }
+        // Per-type
+        switch (schema.type) {
+            case 'boolean':
+                return value;
+            case 'number':
+            case 'integer':
+                return this.decodeNumber(untypedSchema, value, path);
+            case 'string':
+                return this.decodeString(untypedSchema, value, path);
+            case 'object':
+                return this.decodeObject(untypedSchema, value, path);
+            case 'array':
+                return this.decodeArray(untypedSchema, value, path);
+            default:
+                this.errors.push({ path, message: 'must be a valid data type' });
+                return this.defaultValue(schema);
         }
     }
-    return result;
-}
 
-function decodeArray<T>(schema: ArraySchema<T>, value: unknown, path: string[], errors: DecodeError[]): T[] {
-    const result: any[] = [];
-    const original = value as any[];
-    for (const value of original) {
-        const item = decodeAny(schema.items, value, path.concat(['*']), errors);
-        result.push(item);
+
+    decodeNumber(schema: NumberSchema, value: unknown, path: string[]): number {
+        const num = value as number;
+        let valid = true;
+        if (schema.minimum != null && num < schema.minimum) {
+            this.errors.push({ path, message: `must be greater than or equal to ${schema.minimum}` });
+            valid = false;
+        }
+        if (schema.maximum != null && num > schema.maximum) {
+            this.errors.push({ path, message: `must be less than or equal to ${schema.maximum}` });
+            valid = false;
+        }
+        return valid ? num : this.defaultValue(schema);
     }
-    return result;
-}
 
-function defaultValue(schema: { type: SchemaType, default?: any, optional?: true, nullable?: true }) {
-    return schema.default ?? (
-        schema.optional ? undefined :
-            schema.nullable ? null :
-                defaults[schema.type]);
+    decodeString(schema: StringSchema, value: unknown, path: string[]): string {
+        const str = value as string;
+        let valid = true;
+        if (schema.enum != null && !schema.enum.includes(str)) {
+            this.errors.push({ path, message: `must be an allowed value` });
+            valid = false;
+        }
+        if (schema.regex != null && new RegExp(schema.regex, schema.regexFlags ?? '').test(str)) {
+            this.errors.push({ path, message: `must be in allowed format` });
+            valid = false;
+        }
+        return valid ? str : this.defaultValue(schema);
+    }
+
+    decodeObject<T>(schema: ObjectSchema<T>, value: unknown, path: string[]) {
+        const propKeys = new Set<string>();
+        const result: any = {};
+        const original: any = value;
+        for (const [key, propSchema] of Object.entries(schema.properties)) {
+            const value = original[key];
+            const decoded = this.decodeAny(propSchema as Schema<any>, value, path.concat([key]));
+            if (decoded !== undefined) {
+                result[key] = decoded;
+            }
+            propKeys.add(key);
+        }
+        if (schema.additionalProperties) {
+            for (const [key, value] of original) {
+                if (propKeys.has(key)) {
+                    continue;
+                }
+                result[key] = this.decodeAny(schema.additionalProperties, value, path.concat([key]));
+            }
+        }
+        return result;
+    }
+
+    decodeArray<T>(schema: ArraySchema<T>, value: unknown, path: string[]): T[] {
+        const result: any[] = [];
+        const original = value as any[];
+        for (const value of original) {
+            const item = this.decodeAny(schema.items, value, path.concat(['*']));
+            result.push(item);
+        }
+        return result;
+    }
+
+    defaultValue(schema: { type: SchemaType; default?: any; optional?: true; nullable?: true }) {
+        return schema.default ?? (
+            schema.optional ? undefined :
+                schema.nullable ? null :
+                    defaults[schema.type]);
+    }
+
 }

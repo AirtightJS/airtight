@@ -5,7 +5,7 @@ type CoercionMap = {
     [P in SchemaType]?: {
         [P in DataType | '*']?: (val: any) => any;
     }
-}
+};
 
 const STATIC_COERCIONS: CoercionMap = {
     boolean: {
