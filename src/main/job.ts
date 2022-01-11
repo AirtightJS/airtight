@@ -1,56 +1,17 @@
-import { Exception } from 'typesafe-exception';
-
 import { coerce } from './coerce';
+import { DecodeError, DecodeOptions, SchemaDecoder, ValidationError } from './decoder';
 import { defaults } from './defaults';
-import { ArraySchema, NumberSchema, ObjectSchema, Schema, SchemaLike, SchemaType, StringSchema } from './schema';
-import { SchemaStore } from './store';
+import { ArraySchema, NumberSchema, ObjectSchema, Schema, SchemaType, StringSchema } from './schema';
 import { getType } from './util';
 
-export class ValidationError extends Exception<{ errors: DecodeError[] }> {
-    status = 400;
-
-    constructor(errors: DecodeError[]) {
-        super('Validation failed', { errors });
-    }
-}
-
-export interface DecodeError {
-    path: string[];
-    message: string;
-}
-
-export interface DecodeOptions {
-    throw?: boolean;
-    refs?: SchemaLike[];
-}
-
-export function decode<T>(schema: Schema<T>, value: unknown, options: DecodeOptions = {}): T {
-    return new Decoder(schema).decode(value, options);
-}
-
-export class Decoder<T> {
-    readonly schema: Schema<T>;
-    readonly store: SchemaStore;
-
-    constructor(schema: Schema<T>, store?: SchemaStore) {
-        this.schema = schema;
-        this.store = store ?? new SchemaStore().add(schema);
-    }
-
-    decode(value: unknown, options: DecodeOptions = {}): T {
-        return new DecodeJob(this, value, options).decode();
-    }
-
-}
-
-class DecodeJob<T> {
+export class DecodeJob<T> {
     errors: DecodeError[] = [];
 
     constructor(
-        readonly decoder: Decoder<T>,
+        readonly decoder: SchemaDecoder<T>,
         readonly value: unknown,
         readonly options: DecodeOptions,
-    ) {}
+    ) { }
 
     decode(): T {
         const res = this.decodeAny(this.decoder.schema, this.value, []);

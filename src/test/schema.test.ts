@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { decode } from '../main/decode';
+import { decode } from '../main/decoder';
 import { Schema } from '../main/schema';
 import { SchemaStore } from '../main/store';
 
@@ -212,7 +212,7 @@ describe('schema', () => {
             interface Bar { foo?: Foo }
 
             const store = new SchemaStore();
-            const FooSchema = store.declare<Foo>({
+            const FooSchema = store.createDecoder<Foo>({
                 id: 'Foo',
                 type: 'object',
                 properties: {
@@ -220,8 +220,7 @@ describe('schema', () => {
                 }
             });
 
-            store.declare<Bar>({
-                id: 'Bar',
+            store.register<Bar>('Bar', {
                 type: 'object',
                 properties: {
                     foo: { type: 'ref', schemaId: 'Foo', optional: true, },
