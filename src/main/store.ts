@@ -1,8 +1,8 @@
 import { SchemaDecoder } from './decoder';
-import { ArraySchema, ObjectSchema, Schema, SchemaLike } from './schema';
+import { ArraySchema, ObjectSchema, Schema } from './schema';
 
 export class SchemaStore {
-    protected refMap = new Map<string, SchemaLike>();
+    protected refMap = new Map<string, Schema<unknown>>();
 
     constructor(readonly parent: SchemaStore | null = null) {}
 
@@ -12,7 +12,7 @@ export class SchemaStore {
         return this;
     }
 
-    add(...schemas: SchemaLike[]) {
+    add(...schemas: Schema<unknown>[]) {
         for (const schema of schemas) {
             this.buildRefMap(schema);
         }
@@ -32,7 +32,7 @@ export class SchemaStore {
         return new SchemaDecoder(schema, this);
     }
 
-    protected buildRefMap(schema: SchemaLike) {
+    protected buildRefMap(schema: Schema<unknown>) {
         if (schema.type === 'ref') {
             return;
         }

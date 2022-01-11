@@ -1,21 +1,26 @@
-export type Schema<T> = (StrictTypeSchema<T> | AnySchema | RefSchema)
-    & (undefined extends T ? { optional: true } : {})
-    & (null extends T ? { nullable: true } : {});
+export type Schema<T> =
+    unknown extends T ? UnknownSchema : (
+        (StrictTypeSchema<T> | AnySchema | RefSchema) &
+        (undefined extends T ? { optional: true } : {}) &
+        (null extends T ? { nullable: true } : {})
+    );
 
 export type SchemaType = Schema<any>['type'];
-
-export type SchemaLike = RefSchema | {
-    type: SchemaType;
-} & BaseSchema;
 
 export type StrictTypeSchema<T> = (
     T extends boolean ? BooleanSchema :
     T extends number ? NumberSchema :
     T extends string ? StringSchema :
     T extends Array<infer P> ? ArraySchema<P>:
-    T extends object ? ObjectSchema<T>:
+    T extends object ? ObjectSchema<T> :
     never
 );
+
+export type UnknownSchema = (
+    AnySchema | RefSchema |
+    BooleanSchema | NumberSchema | StringSchema |
+    ObjectSchema<unknown> | ArraySchema<unknown>
+) & { optional?: true; nullable?: true };
 
 export type BaseSchema = {
     id?: string;

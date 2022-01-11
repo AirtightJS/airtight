@@ -22,7 +22,7 @@ export class DecodeJob<T> {
     }
 
     protected decodeAny<T>(schema: Schema<T>, value: unknown, path: string[]) {
-        const untypedSchema: any = schema;
+        const untypedSchema: Schema<unknown> = schema;
         // Null/Undefined
         if (value == null) {
             if (untypedSchema.optional) {
@@ -57,13 +57,13 @@ export class DecodeJob<T> {
                 return value;
             case 'number':
             case 'integer':
-                return this.decodeNumber(untypedSchema, value, path);
+                return this.decodeNumber(schema, value, path);
             case 'string':
-                return this.decodeString(untypedSchema, value, path);
+                return this.decodeString(schema, value, path);
             case 'object':
-                return this.decodeObject(untypedSchema, value, path);
+                return this.decodeObject(schema, value, path);
             case 'array':
-                return this.decodeArray(untypedSchema, value, path);
+                return this.decodeArray(schema, value, path);
             default:
                 this.errors.push({ path, message: 'must be a valid data type' });
                 return this.defaultValue(schema);

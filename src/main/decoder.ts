@@ -1,7 +1,7 @@
 import { Exception } from 'typesafe-exception';
 
 import { DecodeJob } from './job';
-import { Schema, SchemaLike } from './schema';
+import { Schema } from './schema';
 import { SchemaStore } from './store';
 
 export class ValidationError extends Exception<{ errors: DecodeError[] }> {
@@ -19,7 +19,7 @@ export interface DecodeError {
 
 export interface DecodeOptions {
     throw?: boolean;
-    refs?: SchemaLike[];
+    refs?: Schema<unknown>[];
 }
 
 export function decode<T>(schema: Schema<T>, value: unknown, options: DecodeOptions = {}): T {
