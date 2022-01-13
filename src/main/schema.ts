@@ -24,17 +24,17 @@ export type UnknownSchema = (
     ObjectSchema<unknown> | ArraySchema<unknown>
 ) & { optional?: true; nullable?: true };
 
-export type BaseSchema = {
+export type BaseSchema<T> = {
     id?: string;
     title?: string;
     description?: string;
     metadata?: any;
+    default?: T | (() => T);
 };
 
 export type AnySchema = {
     type: 'any';
-    default?: any;
-} & BaseSchema;
+} & BaseSchema<any>;
 
 export type RefSchema = {
     type: 'ref';
@@ -43,36 +43,31 @@ export type RefSchema = {
 
 export type BooleanSchema = {
     type: 'boolean';
-    default?: boolean;
-} & BaseSchema;
+} & BaseSchema<boolean>;
 
 export type NumberSchema = {
     type: 'number' | 'integer';
-    default?: number;
     minimum?: number;
     maximum?: number;
-} & BaseSchema;
+} & BaseSchema<number>;
 
 export type StringSchema = {
     type: 'string';
-    default?: string;
     regex?: string;
     regexFlags?: string;
     enum?: string[];
-} & BaseSchema;
+} & BaseSchema<string>;
 
 export type ObjectSchema<T> = {
     type: 'object';
-    default?: object;
     properties: PropertiesSpec<T>;
     additionalProperties?: Schema<any>;
-} & BaseSchema;
+} & BaseSchema<T>;
 
 export type ArraySchema<T> = {
     type: 'array';
-    default?: Array<any>;
     items: Schema<T>;
-} & BaseSchema;
+} & BaseSchema<T[]>;
 
 export type PropertiesSpec<T> = {
     [K in keyof T]-?: Schema<T[K]>;

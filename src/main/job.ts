@@ -142,10 +142,11 @@ export class DecodeJob<T> {
     }
 
     defaultValue(schema: { type: SchemaType; default?: any; optional?: true; nullable?: true }) {
-        return schema.default ?? (
-            schema.optional ? undefined :
-                schema.nullable ? null :
-                    defaults[schema.type]);
+        const schemaDefault = schema.default;
+        if (typeof schemaDefault === 'function') {
+            return schemaDefault();
+        }
+        return schemaDefault ?? (schema.optional ? undefined : schema.nullable ? null : defaults[schema.type]);
     }
 
 }
