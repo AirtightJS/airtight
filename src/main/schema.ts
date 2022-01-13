@@ -2,7 +2,8 @@ export type Schema<T> =
     unknown extends T ? UnknownSchema : (
         (StrictTypeSchema<T> | AnySchema | RefSchema) &
         (undefined extends T ? { optional: true } : {}) &
-        (null extends T ? { nullable: true } : {})
+        (null extends T ? { nullable: true } : {}) &
+        BaseSchema<T>
     );
 
 export type SchemaWithId<T> = Schema<T> & { id: string };
@@ -43,31 +44,31 @@ export type RefSchema = {
 
 export type BooleanSchema = {
     type: 'boolean';
-} & BaseSchema<boolean>;
+};
 
 export type NumberSchema = {
     type: 'number' | 'integer';
     minimum?: number;
     maximum?: number;
-} & BaseSchema<number>;
+};
 
 export type StringSchema = {
     type: 'string';
     regex?: string;
     regexFlags?: string;
     enum?: string[];
-} & BaseSchema<string>;
+};
 
 export type ObjectSchema<T> = {
     type: 'object';
     properties: PropertiesSpec<T>;
     additionalProperties?: Schema<any>;
-} & BaseSchema<T>;
+};
 
 export type ArraySchema<T> = {
     type: 'array';
     items: Schema<T>;
-} & BaseSchema<T[]>;
+};
 
 export type PropertiesSpec<T> = {
     [K in keyof T]-?: Schema<T[K]>;
