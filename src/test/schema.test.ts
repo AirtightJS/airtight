@@ -212,7 +212,7 @@ describe('schema', () => {
             interface Bar { foo?: Foo }
 
             const store = new SchemaStore();
-            const FooSchema = store.createDecoder<Foo>({
+            const FooSchema = store.register<Foo>({
                 id: 'Foo',
                 type: 'object',
                 properties: {
@@ -220,7 +220,8 @@ describe('schema', () => {
                 }
             });
 
-            store.register<Bar>('Bar', {
+            const BarSchema = store.register<Bar>({
+                id: 'Bar',
                 type: 'object',
                 properties: {
                     foo: { type: 'ref', schemaId: 'Foo', optional: true, },
@@ -228,8 +229,12 @@ describe('schema', () => {
             });
 
             it('decodes with external references using schema store', () => {
-                const decoded = FooSchema.decode({ bar: { foo: { bar: {} } } });
-                assert.deepStrictEqual(decoded, { bar: { foo: { bar: {} } } });
+                assert.deepStrictEqual(
+                    FooSchema.decode({ bar: { foo: { bar: {} } } }),
+                    { bar: { foo: { bar: {} } } });
+                assert.deepStrictEqual(
+                    BarSchema.decode({ foo: { bar: {} } }),
+                    { foo: { bar: {} } });
             });
 
         });

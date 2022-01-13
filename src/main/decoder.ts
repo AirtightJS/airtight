@@ -32,7 +32,7 @@ export class SchemaDecoder<T> {
 
     constructor(schema: Schema<T>, store?: SchemaStore) {
         this.schema = schema;
-        this.store = store ?? new SchemaStore().add(schema);
+        this.store = new SchemaStore(store).add(schema);
     }
 
     decode(value: unknown, options: DecodeOptions = {}): T {
