@@ -5,6 +5,8 @@ export type Schema<T> =
         (null extends T ? { nullable: true } : {})
     );
 
+export type SchemaWithId<T> = Schema<T> & { id: string };
+
 export type SchemaType = Schema<any>['type'];
 
 export type StrictTypeSchema<T> = (
