@@ -35,7 +35,7 @@ export type BaseSchema<T> = {
 
 export type AnySchema = {
     type: 'any';
-} & BaseSchema<any>;
+};
 
 export type RefSchema = {
     type: 'ref';
