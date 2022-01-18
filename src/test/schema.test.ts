@@ -89,6 +89,55 @@ describe('schema', () => {
             });
         });
 
+        context('additional properties', () => {
+
+            it('decodes additional properties when allowed', () => {
+                type T = {
+                    foo: string;
+                    [key: string]: string;
+                };
+                const schema: Schema<T> = {
+                    type: 'object',
+                    properties: {
+                        foo: { type: 'string' },
+                    },
+                    additionalProperties: { type: 'string' },
+                };
+                assert.deepStrictEqual(decode(schema, {
+                    foo: 123,
+                    bar: true,
+                    baz: 'one',
+                    buz: null
+                }), {
+                    foo: '123',
+                    bar: 'true',
+                    baz: 'one',
+                    buz: '',
+                });
+            });
+
+            it('drops additional properties when not allowed', () => {
+                type T = {
+                    foo: string;
+                };
+                const schema: Schema<T> = {
+                    type: 'object',
+                    properties: {
+                        foo: { type: 'string' }
+                    },
+                };
+                assert.deepStrictEqual(decode(schema, {
+                    foo: 123,
+                    bar: true,
+                    baz: 'one',
+                    buz: null
+                }), {
+                    foo: '123',
+                });
+            });
+
+        });
+
         context('nested objects', () => {
             type T = {
                 prop: string;

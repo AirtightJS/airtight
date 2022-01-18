@@ -112,7 +112,7 @@ export class DecodeJob<T> {
             propKeys.add(key);
         }
         if (schema.additionalProperties) {
-            for (const [key, value] of original) {
+            for (const [key, value] of Object.entries(original)) {
                 if (propKeys.has(key)) {
                     continue;
                 }
