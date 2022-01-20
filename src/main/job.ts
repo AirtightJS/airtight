@@ -16,7 +16,7 @@ export class DecodeJob<T> {
     decode(): T {
         const res = this.decodeAny(this.decoder.schema, this.value, []);
         if (this.options.throw && this.errors.length > 0) {
-            throw new ValidationError(this.errors);
+            throw new ValidationError(this.decoder.schema, this.errors);
         }
         return res;
     }

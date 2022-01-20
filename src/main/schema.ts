@@ -23,7 +23,7 @@ export type UnknownSchema = (
     AnySchema | RefSchema |
     BooleanSchema | NumberSchema | StringSchema |
     ObjectSchema<unknown> | ArraySchema<unknown>
-) & { optional?: true; nullable?: true };
+) & { optional?: true; nullable?: true; id?: string };
 
 export type BaseSchema<T> = {
     id?: string;

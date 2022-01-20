@@ -7,8 +7,8 @@ import { SchemaStore } from './store';
 export class ValidationError extends Exception<{ errors: DecodeError[] }> {
     status = 400;
 
-    constructor(errors: DecodeError[]) {
-        super('Validation failed', { errors });
+    constructor(schema: Schema<unknown>, errors: DecodeError[]) {
+        super(`Validation failed (${schema.id ?? schema.type}}`, { errors });
     }
 }
 
