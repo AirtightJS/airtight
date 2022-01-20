@@ -92,9 +92,12 @@ export class DecodeJob<T> {
             this.errors.push({ path, message: `must be an allowed value` });
             valid = false;
         }
-        if (schema.regex != null && new RegExp(schema.regex, schema.regexFlags ?? '').test(str)) {
-            this.errors.push({ path, message: `must be in allowed format` });
-            valid = false;
+        if (schema.regex != null) {
+            const regex = new RegExp(schema.regex, schema.regexFlags ?? '');
+            if (!regex.test(str)) {
+                this.errors.push({ path, message: `must be in allowed format` });
+                valid = false;
+            }
         }
         return valid ? str : this.defaultValue(schema);
     }
