@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { decode } from '../main/decoder';
+import { decode } from '../main/decode';
 import { Schema } from '../main/schema';
 
 interface Product {
