@@ -1,15 +1,15 @@
 import { coerce } from './coerce';
-import { DecodeOptions, SchemaDecoder } from './decoder';
 import { defaults } from './defaults';
 import { DecodeError, ValidationError } from './errors';
-import { ArraySchema, NumberSchema, ObjectSchema, Schema, SchemaType, StringSchema } from './schema';
+import { DecodeOptions, Schema } from './schema';
+import { ArraySchemaDef, NumberSchemaDef, ObjectSchemaDef, SchemaDef, SchemaDefType, StringSchemaDef } from './schema-def';
 import { getType } from './util';
 
 export class DecodeJob<T> {
     errors: DecodeError[] = [];
 
     constructor(
-        readonly decoder: SchemaDecoder<T>,
+        readonly decoder: Schema<T>,
         readonly value: unknown,
         readonly options: DecodeOptions,
     ) { }
@@ -22,8 +22,8 @@ export class DecodeJob<T> {
         return res;
     }
 
-    protected decodeAny<T>(schema: Schema<T>, value: unknown, path: string) {
-        const untypedSchema: Schema<unknown> = schema;
+    protected decodeAny<T>(schema: SchemaDef<T>, value: unknown, path: string) {
+        const untypedSchema: SchemaDef<unknown> = schema;
         // Null/Undefined
         if (value == null) {
             if (untypedSchema.optional) {
@@ -71,7 +71,7 @@ export class DecodeJob<T> {
         }
     }
 
-    protected decodeNumber(schema: NumberSchema, value: unknown, path: string): number {
+    protected decodeNumber(schema: NumberSchemaDef, value: unknown, path: string): number {
         const num = value as number;
         let valid = true;
         if (schema.minimum != null && num < schema.minimum) {
@@ -85,7 +85,7 @@ export class DecodeJob<T> {
         return valid ? num : this.defaultValue(schema);
     }
 
-    protected decodeString(schema: StringSchema, value: unknown, path: string): string {
+    protected decodeString(schema: StringSchemaDef, value: unknown, path: string): string {
         const str = value as string;
         let valid = true;
         if (schema.enum != null && !schema.enum.includes(str)) {
@@ -102,13 +102,13 @@ export class DecodeJob<T> {
         return valid ? str : this.defaultValue(schema);
     }
 
-    protected decodeObject<T>(schema: ObjectSchema<T>, value: unknown, path: string) {
+    protected decodeObject<T>(schema: ObjectSchemaDef<T>, value: unknown, path: string) {
         const propKeys = new Set<string>();
         const result: any = {};
         const original: any = value;
         for (const [key, propSchema] of Object.entries(schema.properties)) {
             const value = original[key];
-            const decoded = this.decodeAny(propSchema as Schema<any>, value, `${path}.${key}`);
+            const decoded = this.decodeAny(propSchema as SchemaDef<any>, value, `${path}.${key}`);
             if (decoded !== undefined) {
                 result[key] = decoded;
             }
@@ -125,7 +125,7 @@ export class DecodeJob<T> {
         return result;
     }
 
-    protected decodeArray<T>(schema: ArraySchema<T>, value: unknown, path: string): T[] {
+    protected decodeArray<T>(schema: ArraySchemaDef<T>, value: unknown, path: string): T[] {
         const result: any[] = [];
         const original = value as any[];
         for (const value of original) {
@@ -141,10 +141,10 @@ export class DecodeJob<T> {
             this.errors.push({ path, message: `unknown type ${schemaId}` });
             return undefined;
         }
-        return this.decodeAny(refSchema as Schema<any>, value, path);
+        return this.decodeAny(refSchema.schema, value, path);
     }
 
-    protected defaultValue(schema: { type: SchemaType; default?: any; optional?: true; nullable?: true }) {
+    protected defaultValue(schema: { type: SchemaDefType; default?: any; optional?: true; nullable?: true }) {
         const schemaDefault = schema.default;
         if (typeof schemaDefault === 'function') {
             return schemaDefault();

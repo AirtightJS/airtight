@@ -1,7 +1,7 @@
-import { SchemaType } from './schema';
+import { SchemaDefType } from './schema-def';
 
 type DefaultsMap = {
-    [K in SchemaType]: any;
+    [K in SchemaDefType]: any;
 };
 
 export const defaults: DefaultsMap = {

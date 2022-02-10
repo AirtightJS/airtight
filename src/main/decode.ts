@@ -1,6 +1,6 @@
-import { DecodeOptions, SchemaDecoder } from './decoder';
-import { Schema } from './schema';
+import { DecodeOptions, Schema } from './schema';
+import { SchemaDef } from './schema-def';
 
-export function decode<T>(schema: Schema<T>, value: unknown, options: DecodeOptions = {}): T {
-    return new SchemaDecoder(schema).decode(value, options);
+export function decode<T>(schema: SchemaDef<T>, value: unknown, options: DecodeOptions = {}): T {
+    return new Schema(schema).decode(value, options);
 }

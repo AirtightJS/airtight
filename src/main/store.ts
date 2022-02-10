@@ -1,18 +1,18 @@
-import { SchemaWithId } from '.';
-import { SchemaDecoder } from './decoder';
 import { Schema } from './schema';
+import { SchemaDef } from './schema-def';
+import { SchemaDefWithId } from './schema-def.js';
 
 export class SchemaStore {
-    protected map = new Map<string, Schema<unknown>>();
+    protected map = new Map<string, SchemaDef<unknown>>();
 
     constructor(readonly parent: SchemaStore | null = null) {}
 
-    register<T>(schema: SchemaWithId<T>): SchemaDecoder<T> {
+    register<T>(schema: SchemaDefWithId<T>): Schema<T> {
         this.map.set(schema.id, schema);
-        return new SchemaDecoder(schema, this);
+        return new Schema(schema, this);
     }
 
-    add(...schemas: Schema<unknown>[]): this {
+    add(...schemas: SchemaDef<unknown>[]): this {
         for (const schema of schemas) {
             const id = (schema as any).id;
             if (id) {
@@ -23,9 +23,9 @@ export class SchemaStore {
     }
 
     get<T>(schemaId: string): Schema<T> | null {
-        const schema = this.map.get(schemaId);
-        if (schema) {
-            return schema as Schema<T>;
+        const sch = this.map.get(schemaId);
+        if (sch) {
+            return new Schema<T>(sch, this);
         }
         return this.parent?.get(schemaId) ?? null;
     }

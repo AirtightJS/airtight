@@ -1,8 +1,8 @@
-import { SchemaType } from './schema';
+import { SchemaDefType } from './schema-def';
 import { DataType, getType } from './util';
 
 type CoercionMap = {
-    [P in SchemaType]?: {
+    [P in SchemaDefType]?: {
         [P in DataType | '*']?: (val: any) => any;
     }
 };
@@ -48,7 +48,7 @@ const STATIC_COERCIONS: CoercionMap = {
     }
 };
 
-export function coerce(desiredType: SchemaType, value: unknown): any | undefined {
+export function coerce(desiredType: SchemaDefType, value: unknown): any | undefined {
     const actualType = getType(value);
     if (actualType === desiredType) {
         return value;

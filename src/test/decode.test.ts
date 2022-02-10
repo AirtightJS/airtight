@@ -1,7 +1,7 @@
 import assert from 'assert';
 
 import { decode } from '../main/decode';
-import { Schema } from '../main/schema';
+import { SchemaDef } from '../main/schema-def';
 
 interface Product {
     title: string;
@@ -16,7 +16,7 @@ interface Price {
     currency: 'gbp' | 'eur' | 'usd';
 }
 
-const PriceSchema: Schema<Price> = {
+const PriceSchema: SchemaDef<Price> = {
     type: 'object',
     properties: {
         value: { type: 'integer' },
@@ -28,7 +28,7 @@ const PriceSchema: Schema<Price> = {
     },
 };
 
-const ProductSchema: Schema<Product> = {
+const ProductSchema: SchemaDef<Product> = {
     type: 'object',
     properties: {
         title: {

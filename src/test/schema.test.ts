@@ -1,7 +1,7 @@
 import assert from 'assert';
 
 import { decode } from '../main/decode';
-import { Schema } from '../main/schema';
+import { SchemaDef } from '../main/schema-def';
 import { SchemaStore } from '../main/store';
 
 describe('schema', () => {
@@ -59,7 +59,7 @@ describe('schema', () => {
                 bar: number;
                 baz: boolean;
             };
-            const schema: Schema<T> = {
+            const schema: SchemaDef<T> = {
                 type: 'object',
                 properties: {
                     foo: { type: 'string' },
@@ -96,7 +96,7 @@ describe('schema', () => {
                     foo: string;
                     [key: string]: string;
                 };
-                const schema: Schema<T> = {
+                const schema: SchemaDef<T> = {
                     type: 'object',
                     properties: {
                         foo: { type: 'string' },
@@ -120,7 +120,7 @@ describe('schema', () => {
                 type T = {
                     foo: string;
                 };
-                const schema: Schema<T> = {
+                const schema: SchemaDef<T> = {
                     type: 'object',
                     properties: {
                         foo: { type: 'string' }
@@ -145,7 +145,7 @@ describe('schema', () => {
                     foo: string;
                 };
             };
-            const schema: Schema<T> = {
+            const schema: SchemaDef<T> = {
                 type: 'object',
                 properties: {
                     prop: { type: 'string' },
@@ -174,7 +174,7 @@ describe('schema', () => {
                 bar: string | null;
                 baz?: string | null;
             };
-            const schema: Schema<T> = {
+            const schema: SchemaDef<T> = {
                 type: 'object',
                 properties: {
                     foo: { type: 'string', optional: true },
@@ -209,7 +209,7 @@ describe('schema', () => {
                 children: Node[];
             }
 
-            const schema: Schema<Node> = {
+            const schema: SchemaDef<Node> = {
                 id: 'Node',
                 type: 'object',
                 properties: {
