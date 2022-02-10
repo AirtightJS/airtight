@@ -1,6 +1,7 @@
 import { DecodeJob } from './job';
 import { Schema } from './schema';
 import { SchemaStore } from './store';
+import { DeepPartial } from './util.js';
 
 export interface DecodeOptions {
     throw?: boolean;
@@ -15,7 +16,7 @@ export class SchemaDecoder<T> {
         this.store = new SchemaStore(store).add(schema);
     }
 
-    create(partials: Partial<T>): T {
+    create(partials: DeepPartial<T>): T {
         return this.decode(partials, { throw: false });
     }
 
