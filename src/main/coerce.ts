@@ -58,5 +58,11 @@ export function coerce(desiredType: SchemaDefType, value: unknown): any | undefi
     if (coercion) {
         return coercion(value);
     }
+    if (actualType === 'array') {
+        const arr = value as any[];
+        if (arr.length === 1) {
+            return coerce(desiredType, arr[0]);
+        }
+    }
     return undefined;
 }

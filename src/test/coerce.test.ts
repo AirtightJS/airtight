@@ -22,8 +22,8 @@ describe('coerce', () => {
         testCase('boolean', { foo: 123 }, undefined);
         testCase('boolean', { true: 1 }, undefined);
         testCase('boolean', [], undefined);
-        testCase('boolean', [true], undefined);
-        testCase('boolean', [false], undefined);
+        testCase('boolean', [true], true);
+        testCase('boolean', [false], false);
     });
 
     describe('to number', () => {
@@ -43,6 +43,7 @@ describe('coerce', () => {
         testCase('number', { foo: 123 }, undefined);
         testCase('number', [], undefined);
         testCase('number', ['foo'], undefined);
+        testCase('number', [42], 42);
     });
 
     describe('to integer', () => {
@@ -61,7 +62,9 @@ describe('coerce', () => {
         testCase('integer', '  abs 42.5  ', undefined);
         testCase('integer', { foo: 123 }, undefined);
         testCase('integer', [], undefined);
-        testCase('number', ['foo'], undefined);
+        testCase('integer', ['foo'], undefined);
+        testCase('integer', [42], 42);
+        testCase('integer', [42.5], 42);
     });
 
     describe('to string', () => {
@@ -74,7 +77,7 @@ describe('coerce', () => {
         testCase('string', '42', '42');
         testCase('string', { foo: 123 }, undefined);
         testCase('string', [], undefined);
-        testCase('number', ['foo'], undefined);
+        testCase('string', ['foo'], 'foo');
     });
 
     describe('to object', () => {
@@ -87,6 +90,7 @@ describe('coerce', () => {
         testCase('object', { foo: 123 }, { foo: 123 });
         testCase('object', [], undefined);
         testCase('object', ['foo'], undefined);
+        testCase('object', [{ foo: 123 }], { foo: 123 });
     });
 
     describe('to array', () => {
@@ -99,6 +103,7 @@ describe('coerce', () => {
         testCase('array', { foo: 123 }, [{ foo: 123 }]);
         testCase('array', [], []);
         testCase('array', ['foo'], ['foo']);
+        testCase('array', [['foo']], [['foo']]);
     });
 
 });

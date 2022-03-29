@@ -112,8 +112,8 @@ describe('decode', () => {
             } catch (error: any) {
                 assert.strictEqual(error.name, 'ValidationError');
                 assert.deepStrictEqual(error.details.errors, [
-                    { path: ['value'], message: 'must be integer' },
-                    { path: ['currency'], message: 'must be an allowed value' },
+                    { path: '.value', message: 'must be integer' },
+                    { path: '.currency', message: 'must be an allowed value' },
                 ]);
             }
         });
