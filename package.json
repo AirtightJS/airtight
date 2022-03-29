@@ -1,6 +1,6 @@
 {
     "name": "airtight",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Tight subset of JSON schema",
     "main": "out/main/index.js",
     "types": "out/main/index.d.ts",
