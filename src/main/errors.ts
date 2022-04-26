@@ -1,23 +1,23 @@
 import { Exception } from 'typesafe-exception';
 
 import { SchemaDef } from './schema-def';
-import { capitalize } from './util';
 
 export class ValidationError extends Exception<{ errors: DecodeError[] }> {
     status = 400;
 
     constructor(schema: SchemaDef<unknown>, errors: DecodeError[]) {
         super('ValidationError', { errors });
-        const type = capitalize(schema.id ?? schema.type);
         const msg = this.formatMessage(errors);
+        const type = schema.id ?? schema.type;
         this.message = `${type} validation failed:\n${msg}`;
     }
 
     protected formatMessage(errors: DecodeError[]) {
-        return errors.map(e => {
-            const pointer = e.path;
-            return `  - ${pointer} ${e.path}`;
-        }).join('\n');
+        const errs = errors.map(e => {
+            return `  - ${e.path} ${e.message}`;
+        });
+        const lines = [...new Set(errs)];
+        return lines.sort().join('\n');
     }
 }
 
