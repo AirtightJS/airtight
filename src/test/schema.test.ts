@@ -1,8 +1,8 @@
 import assert from 'assert';
 
 import { decode } from '../main/decode';
-import { SchemaDef } from '../main/schema-def';
-import { SchemaStore } from '../main/store';
+import { Schema } from '../main/schema.js';
+import { SchemaDef, SchemaRefs } from '../main/schema-def';
 
 describe('schema', () => {
 
@@ -260,21 +260,33 @@ describe('schema', () => {
             interface Foo { bar?: Bar }
             interface Bar { foo?: Foo }
 
-            const store = new SchemaStore();
-            const FooSchema = store.register<Foo>({
-                id: 'Foo',
-                type: 'object',
-                properties: {
-                    bar: { type: 'ref', schemaId: 'Bar', optional: true, },
+            const refs: SchemaRefs = [
+                {
+                    id: 'Foo',
+                    type: 'object',
+                    properties: {
+                        bar: { type: 'ref', schemaId: 'Bar', optional: true, },
+                    }
+                },
+                {
+                    id: 'Bar',
+                    type: 'object',
+                    properties: {
+                        foo: { type: 'ref', schemaId: 'Foo', optional: true, },
+                    }
                 }
+            ];
+
+            const FooSchema = new Schema<Foo>({
+                type: 'ref',
+                schemaId: 'Foo',
+                refs,
             });
 
-            const BarSchema = store.register<Bar>({
-                id: 'Bar',
-                type: 'object',
-                properties: {
-                    foo: { type: 'ref', schemaId: 'Foo', optional: true, },
-                }
+            const BarSchema = new Schema<Foo>({
+                type: 'ref',
+                schemaId: 'Bar',
+                refs,
             });
 
             it('decodes with external references using schema store', () => {

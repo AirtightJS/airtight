@@ -23,7 +23,9 @@ export type UnknownSchemaDef = (
     AnySchemaDef | RefSchemaDef |
     BooleanSchemaDef | NumberSchemaDef | StringSchemaDef |
     ObjectSchemaDef<unknown> | ArraySchemaDef<unknown>
-) & { optional?: true; nullable?: true; id?: string };
+) & { optional?: true; nullable?: true } & BaseSchemaDef<unknown>;
+
+export type SchemaRefs = SchemaDefWithId<unknown>[];
 
 export type BaseSchemaDef<T> = {
     id?: string;
@@ -31,6 +33,7 @@ export type BaseSchemaDef<T> = {
     description?: string;
     metadata?: any;
     default?: T | (() => T);
+    refs?: SchemaRefs;
 };
 
 export type AnySchemaDef = {

@@ -2,7 +2,7 @@ import { coerce } from './coerce';
 import { defaults } from './defaults';
 import { DecodeError, ValidationError } from './errors';
 import { DecodeOptions, Schema } from './schema';
-import { ArraySchemaDef, NumberSchemaDef, ObjectSchemaDef, SchemaDef, SchemaDefType, StringSchemaDef } from './schema-def';
+import { ArraySchemaDef, NumberSchemaDef, ObjectSchemaDef, SchemaDef, SchemaDefType, SchemaDefWithId, StringSchemaDef } from './schema-def';
 import { getType } from './util';
 
 export class DecodeJob<T> {
@@ -136,12 +136,12 @@ export class DecodeJob<T> {
     }
 
     protected decodeRef(schemaId: string, value: unknown, path: string): any {
-        const refSchema = this.decoder.store.get(schemaId);
+        const refSchema = this.getRefs().find(_ => _.id === schemaId);
         if (!refSchema) {
             this.errors.push({ path, message: `unknown type ${schemaId}` });
             return undefined;
         }
-        return this.decodeAny(refSchema.schema, value, path);
+        return this.decodeAny(refSchema, value, path);
     }
 
     protected defaultValue(schema: { type: SchemaDefType; default?: any; optional?: true; nullable?: true }) {
@@ -150,6 +150,15 @@ export class DecodeJob<T> {
             return schemaDefault();
         }
         return schemaDefault ?? (schema.optional ? undefined : schema.nullable ? null : defaults[schema.type]);
+    }
+
+    protected getRefs(): SchemaDefWithId<unknown>[] {
+        const { schema } = this.decoder;
+        const refs: SchemaDefWithId<unknown>[] = schema.refs || [];
+        if (schema.id) {
+            refs.push(schema as any);
+        }
+        return refs;
     }
 
 }

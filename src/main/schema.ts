@@ -1,6 +1,5 @@
 import { DecodeJob } from './job';
 import { SchemaDef } from './schema-def';
-import { SchemaStore } from './store';
 import { DeepPartial } from './util.js';
 
 export interface DecodeOptions {
@@ -9,11 +8,9 @@ export interface DecodeOptions {
 
 export class Schema<T> {
     readonly schema: SchemaDef<T>;
-    readonly store: SchemaStore;
 
-    constructor(schema: SchemaDef<T>, store?: SchemaStore) {
+    constructor(schema: SchemaDef<T>) {
         this.schema = schema;
-        this.store = new SchemaStore(store).add(schema);
     }
 
     create(partials: DeepPartial<T>): T {
@@ -22,6 +19,10 @@ export class Schema<T> {
 
     decode(value: unknown, options: DecodeOptions = {}): T {
         return new DecodeJob(this, value, options).decode();
+    }
+
+    validate(value: unknown): void {
+        new DecodeJob(this, value, { throw: true }).decode();
     }
 
 }
