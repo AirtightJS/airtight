@@ -1,4 +1,4 @@
-export type SchemaDef<T> =
+export type SchemaDef<T = unknown> =
     unknown extends T ? UnknownSchemaDef : (
         (StrictSchemaDef<T> | AnySchemaDef | RefSchemaDef) &
         (undefined extends T ? { optional: true } : {}) &
@@ -6,7 +6,7 @@ export type SchemaDef<T> =
         BaseSchemaDef<T>
     );
 
-export type SchemaDefWithId<T> = SchemaDef<T> & { id: string };
+export type SchemaDefWithId<T = unknown> = SchemaDef<T> & { id: string };
 
 export type SchemaDefType = SchemaDef<any>['type'];
 

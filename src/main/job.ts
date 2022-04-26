@@ -136,7 +136,7 @@ export class DecodeJob<T> {
     }
 
     protected decodeRef(schemaId: string, value: unknown, path: string): any {
-        const refSchema = this.getRefs().find(_ => _.id === schemaId);
+        const refSchema = this.decoder.getRef(schemaId);
         if (!refSchema) {
             this.errors.push({ path, message: `unknown type ${schemaId}` });
             return undefined;
@@ -150,15 +150,6 @@ export class DecodeJob<T> {
             return schemaDefault();
         }
         return schemaDefault ?? (schema.optional ? undefined : schema.nullable ? null : defaults[schema.type]);
-    }
-
-    protected getRefs(): SchemaDefWithId<unknown>[] {
-        const { schema } = this.decoder;
-        const refs: SchemaDefWithId<unknown>[] = schema.refs || [];
-        if (schema.id) {
-            refs.push(schema as any);
-        }
-        return refs;
     }
 
 }
