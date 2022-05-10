@@ -1,7 +1,7 @@
 {
     "name": "airtight",
     "version": "2.1.0",
-    "description": "Tight subset of JSON schema",
+    "description": "JSON Schema inspired library for validating and decoding messages",
     "main": "out/main/index.js",
     "types": "out/main/index.d.ts",
     "files": [

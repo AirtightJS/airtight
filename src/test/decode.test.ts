@@ -2,6 +2,7 @@ import assert from 'assert';
 
 import { decode } from '../main/decode';
 import { SchemaDef } from '../main/schema-def';
+import { Schema } from '../main/schema.js';
 
 interface Product {
     title: string;
