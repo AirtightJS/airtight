@@ -9,7 +9,7 @@ type CoercionMap = {
 
 const STATIC_COERCIONS: CoercionMap = {
     boolean: {
-        number: (val: number) => val === 0 ? false : val === 1 ? true : undefined,
+        number: (val: number) => val > 0,
         string: (val: string) => {
             val = val.trim().toLowerCase();
             return val === 'true' ? true :

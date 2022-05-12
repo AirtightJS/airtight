@@ -1,8 +1,8 @@
 import { coerce } from './coerce';
 import { defaults } from './defaults';
 import { DecodeError, ValidationError } from './errors';
-import { DecodeOptions, Schema } from './schema';
-import { ArraySchemaDef, NumberSchemaDef, ObjectSchemaDef, SchemaDef, SchemaDefType, SchemaDefWithId, StringSchemaDef } from './schema-def';
+import { Schema } from './schema';
+import { ArraySchemaDef, NumberSchemaDef, ObjectSchemaDef, SchemaDef, SchemaDefType, StringSchemaDef } from './schema-def';
 import { getType } from './util';
 
 export class DecodeJob<T> {
@@ -11,12 +11,11 @@ export class DecodeJob<T> {
     constructor(
         readonly decoder: Schema<T>,
         readonly value: unknown,
-        readonly options: DecodeOptions,
-    ) { }
+    ) {}
 
     decode(): T {
         const res = this.decodeAny(this.decoder.schema, this.value, '');
-        if (this.options.throw && this.errors.length > 0) {
+        if (this.errors.length > 0) {
             throw new ValidationError(this.decoder.schema, this.errors);
         }
         return res;
@@ -32,8 +31,9 @@ export class DecodeJob<T> {
             if (untypedSchema.nullable) {
                 return null;
             }
-            this.errors.push({ path, message: 'must not be null' });
             value = this.defaultValue(schema);
+            // This used to be an option, but decided to remove it to make less room for interpretation
+            // this.errors.push({ path, message: 'must not be null' });
         }
         // Any Schema
         if (schema.type === 'any') {

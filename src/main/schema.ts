@@ -1,10 +1,6 @@
-import { DecodeJob } from './job';
+import { DecodeJob } from './decode';
 import { SchemaDef } from './schema-def';
 import { DeepPartial } from './util.js';
-
-export interface DecodeOptions {
-    throw?: boolean;
-}
 
 export class Schema<T> {
     readonly schema: SchemaDef<T>;
@@ -16,15 +12,11 @@ export class Schema<T> {
     }
 
     create(partials: DeepPartial<T>): T {
-        return this.decode(partials, { throw: false });
+        return this.decode(partials);
     }
 
-    decode(value: unknown, options: DecodeOptions = {}): T {
-        return new DecodeJob(this, value, options).decode();
-    }
-
-    validate(value: unknown): void {
-        new DecodeJob(this, value, { throw: true }).decode();
+    decode(value: unknown): T {
+        return new DecodeJob(this, value).decode();
     }
 
     getRef(schemaId: string): SchemaDef | null {

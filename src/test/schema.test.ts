@@ -7,46 +7,42 @@ describe('schema', () => {
 
     describe('type: boolean', () => {
         it('coerce from basic types', () => {
-            assert.strictEqual(new Schema<boolean>({ type: 'boolean' }).decode('foo'), false);
             assert.strictEqual(new Schema<boolean>({ type: 'boolean' }).decode('false'), false);
             assert.strictEqual(new Schema<boolean>({ type: 'boolean' }).decode('true'), true);
             assert.strictEqual(new Schema<boolean>({ type: 'boolean' }).decode(1), true);
         });
 
-        it('applies default for invalid values', () => {
-            assert.strictEqual(new Schema<boolean>({ type: 'boolean' }).decode('foo'), false);
-            assert.strictEqual(new Schema<boolean>({ type: 'boolean', default: true }).decode('foo'), true);
+        it('throws on invalid values', () => {
+            assert.throws(() => new Schema<boolean>({ type: 'boolean' }).decode('foo'));
+            assert.throws(() => new Schema<boolean>({ type: 'boolean', default: true }).decode('foo'));
         });
     });
 
     describe('type: number', () => {
         it('coerce from basic types', () => {
-            assert.strictEqual(new Schema<number>({ type: 'number' }).decode('foo'), 0);
-            assert.strictEqual(new Schema<number>({ type: 'number' }).decode('false'), 0);
             assert.strictEqual(new Schema<number>({ type: 'number' }).decode(true), 1);
             assert.strictEqual(new Schema<number>({ type: 'number' }).decode('42'), 42);
             assert.strictEqual(new Schema<number>({ type: 'number' }).decode('42.5'), 42.5);
         });
 
-        it('applies default for invalid values', () => {
-            assert.strictEqual(new Schema<number>({ type: 'number' }).decode('foo'), 0);
-            assert.strictEqual(new Schema<number>({ type: 'number', default: 42 }).decode('foo'), 42);
+        it('throws on invalid values', () => {
+            assert.throws(() => new Schema<number>({ type: 'number' }).decode('foo'));
+            assert.throws(() => new Schema<number>({ type: 'number' }).decode('false'));
+            assert.throws(() => new Schema<number>({ type: 'number', default: 42 }).decode('foo'));
         });
     });
 
     describe('type: integer', () => {
         it('coerce from basic types', () => {
-            assert.strictEqual(new Schema<number>({ type: 'integer' }).decode('foo'), 0);
-            assert.strictEqual(new Schema<number>({ type: 'integer' }).decode('false'), 0);
             assert.strictEqual(new Schema<number>({ type: 'integer' }).decode(true), 1);
             assert.strictEqual(new Schema<number>({ type: 'integer' }).decode('42'), 42);
             assert.strictEqual(new Schema<number>({ type: 'integer' }).decode('42.5'), 42);
             assert.strictEqual(new Schema<number>({ type: 'integer' }).decode(42.5), 42);
         });
 
-        it('applies default for invalid values', () => {
-            assert.strictEqual(new Schema<number>({ type: 'integer' }).decode('foo'), 0);
-            assert.strictEqual(new Schema<number>({ type: 'integer', default: 42 }).decode('foo'), 42);
+        it('throws on invalid values', () => {
+            assert.throws(() => new Schema<number>({ type: 'integer' }).decode('foo'));
+            assert.throws(() => new Schema<number>({ type: 'integer', default: 42 }).decode('foo'));
         });
     });
 
@@ -188,14 +184,12 @@ describe('schema', () => {
                 });
             });
 
-            it('omits invalid optionals', () => {
-                assert.deepStrictEqual(schema.decode({
+            it('throws if optionals are invalid', () => {
+                assert.throws(() => schema.decode({
                     foo: {},
                     bar: {},
                     baz: {}
-                }), {
-                    bar: null,
-                });
+                }));
             });
         });
     });

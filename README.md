@@ -109,17 +109,15 @@ assert.deepStrictEqual(o1, {
     tags: [],
 });
 
-// Validate an object (throws if validation fails):
+// Decode throws if validation fails
 
 try {
-    ProductSchema.validate({
-        title: 'Shampoo',
-        price: { value: '42' },
+    ProductSchema.decode({
+        title: { something: 'wrong' },
     });
 } catch (error) {
     // ValidationError: object validation failed:
-    // - .price.currency must not be null
-    // - .tags must not be null
+    // - .title must be a string
 }
 ```
 
@@ -127,15 +125,16 @@ try {
 
 - Create a schema with `new Schema<T>({ ... })` where `T` is either a `type` or an `interface`. TypeScript will guide you through composing a schema definition that matches `T`.
 
-- `schema.decode(value: unknown, { throw: boolean = false })` can be used to decode messages in two modes:
+- `schema.decode(value: unknown)` decodes the message as follows:
 
-    - `throw: false` (default) will use a default value if a particular validation fails. It works recursively, so it will always produce an object matching `T` (including nested sub-objects).
-    - `throw: true` will not attempt to use a default value to replace failed validations and will throw instead.
-    - Type conversion is NOT considered a failed validation. For example, the `type: 'number'` schema will automatically convert `"42"` into `42" and will not throw.
+    - if the schema is nullable or optional and the value is null-ish, either `null` or `undefined` is returned according to schema
+    - if the schema is required (i.e. neither nullable nor optional) and the value is null-ish, the default is used; this is not considered a validation failure
+    - `type: 'any'` schema is returned as-is
+    - `type: 'ref'` schema is dereferenced and validated
+    - the value is coerced to schema type if possible (see below); type conversion is not considered a validation failure
+    - per-type validations are applied (see below), recursing into object properties and array items
 
-- `schema.create(value: DeepPartial<T>)` is the same as `schema.decode(value, { throw: false })` but offers an additional advantage of type-checking `value`, useful for creating objects programmatically from code so that the arguments you pass can be statically checked.
-
-- `schema.validate(value: unknown)` is the same as `schema.decode(value, { throw: true })`
+- `schema.create(value: DeepPartial<T>)` is a convenience method that offers an additional advantage of type-checking `value` — useful for creating objects programmatically from code so that the arguments you pass can be statically checked.
 
 ## Supported types
 
@@ -176,8 +175,8 @@ Type conversion happens automatically when the actual type does not match the de
 
 | Schema type      | Type (Value)          | Result                   |
 |------------------|-----------------------|--------------------------|
-| boolean          | number (0)            | false                    |
-| boolean          | number (1)            | true                     |
+| boolean          | number (<= 0)         | false                    |
+| boolean          | number (> 0)          | true                     |
 | boolean          | number (any other)    | ❌                        |
 | boolean          | string ("true")       | true                     |
 | boolean          | string ("false")      | false                    |

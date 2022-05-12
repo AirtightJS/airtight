@@ -87,27 +87,12 @@ describe('decode', () => {
             });
         });
 
-        it('use default for invalid values', () => {
-            const price = PriceSchema.decode({
-                value: 'foo',
-                currency: 'bar',
-            });
-            assert.deepStrictEqual(price, {
-                value: 0,
-                currency: 'gbp',
-            });
-        });
-
-    });
-
-    describe('throw on invalid', () => {
-
         it('throws on invalid values', () => {
             try {
                 PriceSchema.decode({
                     value: 'foo',
                     currency: 'bar',
-                }, { throw: true });
+                });
             } catch (error: any) {
                 assert.strictEqual(error.name, 'ValidationError');
                 assert.deepStrictEqual(error.details.errors, [

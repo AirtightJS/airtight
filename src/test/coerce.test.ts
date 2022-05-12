@@ -12,7 +12,7 @@ describe('coerce', () => {
         testCase('boolean', true, true);
         testCase('boolean', 0, false);
         testCase('boolean', 1, true);
-        testCase('boolean', 42, undefined);
+        testCase('boolean', 42, true);
         testCase('boolean', 'true', true);
         testCase('boolean', '  true  ', true);
         testCase('boolean', 'false', false);
