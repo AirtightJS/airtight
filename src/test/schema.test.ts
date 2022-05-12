@@ -1,53 +1,52 @@
 import assert from 'assert';
 
-import { decode } from '../main/decode';
 import { Schema } from '../main/schema.js';
-import { SchemaDef, SchemaRefs } from '../main/schema-def';
+import { SchemaRefs } from '../main/schema-def';
 
 describe('schema', () => {
 
     describe('type: boolean', () => {
         it('coerce from basic types', () => {
-            assert.strictEqual(decode<boolean>({ type: 'boolean' }, 'foo'), false);
-            assert.strictEqual(decode<boolean>({ type: 'boolean' }, 'false'), false);
-            assert.strictEqual(decode<boolean>({ type: 'boolean' }, 'true'), true);
-            assert.strictEqual(decode<boolean>({ type: 'boolean' }, 1), true);
+            assert.strictEqual(new Schema<boolean>({ type: 'boolean' }).decode('foo'), false);
+            assert.strictEqual(new Schema<boolean>({ type: 'boolean' }).decode('false'), false);
+            assert.strictEqual(new Schema<boolean>({ type: 'boolean' }).decode('true'), true);
+            assert.strictEqual(new Schema<boolean>({ type: 'boolean' }).decode(1), true);
         });
 
         it('applies default for invalid values', () => {
-            assert.strictEqual(decode<boolean>({ type: 'boolean' }, 'foo'), false);
-            assert.strictEqual(decode<boolean>({ type: 'boolean', default: true }, 'foo'), true);
+            assert.strictEqual(new Schema<boolean>({ type: 'boolean' }).decode('foo'), false);
+            assert.strictEqual(new Schema<boolean>({ type: 'boolean', default: true }).decode('foo'), true);
         });
     });
 
     describe('type: number', () => {
         it('coerce from basic types', () => {
-            assert.strictEqual(decode<number>({ type: 'number' }, 'foo'), 0);
-            assert.strictEqual(decode<number>({ type: 'number' }, 'false'), 0);
-            assert.strictEqual(decode<number>({ type: 'number' }, true), 1);
-            assert.strictEqual(decode<number>({ type: 'number' }, '42'), 42);
-            assert.strictEqual(decode<number>({ type: 'number' }, '42.5'), 42.5);
+            assert.strictEqual(new Schema<number>({ type: 'number' }).decode('foo'), 0);
+            assert.strictEqual(new Schema<number>({ type: 'number' }).decode('false'), 0);
+            assert.strictEqual(new Schema<number>({ type: 'number' }).decode(true), 1);
+            assert.strictEqual(new Schema<number>({ type: 'number' }).decode('42'), 42);
+            assert.strictEqual(new Schema<number>({ type: 'number' }).decode('42.5'), 42.5);
         });
 
         it('applies default for invalid values', () => {
-            assert.strictEqual(decode<number>({ type: 'number' }, 'foo'), 0);
-            assert.strictEqual(decode<number>({ type: 'number', default: 42 }, 'foo'), 42);
+            assert.strictEqual(new Schema<number>({ type: 'number' }).decode('foo'), 0);
+            assert.strictEqual(new Schema<number>({ type: 'number', default: 42 }).decode('foo'), 42);
         });
     });
 
     describe('type: integer', () => {
         it('coerce from basic types', () => {
-            assert.strictEqual(decode<number>({ type: 'integer' }, 'foo'), 0);
-            assert.strictEqual(decode<number>({ type: 'integer' }, 'false'), 0);
-            assert.strictEqual(decode<number>({ type: 'integer' }, true), 1);
-            assert.strictEqual(decode<number>({ type: 'integer' }, '42'), 42);
-            assert.strictEqual(decode<number>({ type: 'integer' }, '42.5'), 42);
-            assert.strictEqual(decode<number>({ type: 'integer' }, 42.5), 42);
+            assert.strictEqual(new Schema<number>({ type: 'integer' }).decode('foo'), 0);
+            assert.strictEqual(new Schema<number>({ type: 'integer' }).decode('false'), 0);
+            assert.strictEqual(new Schema<number>({ type: 'integer' }).decode(true), 1);
+            assert.strictEqual(new Schema<number>({ type: 'integer' }).decode('42'), 42);
+            assert.strictEqual(new Schema<number>({ type: 'integer' }).decode('42.5'), 42);
+            assert.strictEqual(new Schema<number>({ type: 'integer' }).decode(42.5), 42);
         });
 
         it('applies default for invalid values', () => {
-            assert.strictEqual(decode<number>({ type: 'integer' }, 'foo'), 0);
-            assert.strictEqual(decode<number>({ type: 'integer', default: 42 }, 'foo'), 42);
+            assert.strictEqual(new Schema<number>({ type: 'integer' }).decode('foo'), 0);
+            assert.strictEqual(new Schema<number>({ type: 'integer', default: 42 }).decode('foo'), 42);
         });
     });
 
@@ -59,17 +58,17 @@ describe('schema', () => {
                 bar: number;
                 baz: boolean;
             };
-            const schema: SchemaDef<T> = {
+            const schema = new Schema<T>({
                 type: 'object',
                 properties: {
                     foo: { type: 'string' },
                     bar: { type: 'number' },
                     baz: { type: 'boolean' },
                 }
-            };
+            });
 
             it('decodes each property', () => {
-                assert.deepStrictEqual(decode(schema, {
+                assert.deepStrictEqual(schema.decode({
                     foo: '123',
                     bar: '42.5',
                     baz: true,
@@ -81,7 +80,7 @@ describe('schema', () => {
             });
 
             it('applies defaults', () => {
-                assert.deepStrictEqual(decode(schema, {}), {
+                assert.deepStrictEqual(schema.decode({}), {
                     foo: '',
                     bar: 0,
                     baz: false,
@@ -96,14 +95,14 @@ describe('schema', () => {
                     foo: string;
                     [key: string]: string;
                 };
-                const schema: SchemaDef<T> = {
+                const schema = new Schema<T>({
                     type: 'object',
                     properties: {
                         foo: { type: 'string' },
                     },
                     additionalProperties: { type: 'string' },
-                };
-                assert.deepStrictEqual(decode(schema, {
+                });
+                assert.deepStrictEqual(schema.decode({
                     foo: 123,
                     bar: true,
                     baz: 'one',
@@ -120,13 +119,13 @@ describe('schema', () => {
                 type T = {
                     foo: string;
                 };
-                const schema: SchemaDef<T> = {
+                const schema = new Schema<T>({
                     type: 'object',
                     properties: {
                         foo: { type: 'string' }
                     },
-                };
-                assert.deepStrictEqual(decode(schema, {
+                });
+                assert.deepStrictEqual(schema.decode({
                     foo: 123,
                     bar: true,
                     baz: 'one',
@@ -145,7 +144,7 @@ describe('schema', () => {
                     foo: string;
                 };
             };
-            const schema: SchemaDef<T> = {
+            const schema = new Schema<T>({
                 type: 'object',
                 properties: {
                     prop: { type: 'string' },
@@ -156,10 +155,10 @@ describe('schema', () => {
                         }
                     }
                 }
-            };
+            });
 
             it('decodes recursively', () => {
-                assert.deepStrictEqual(decode(schema, {}), {
+                assert.deepStrictEqual(schema.decode({}), {
                     prop: '',
                     obj: {
                         foo: '',
@@ -174,23 +173,23 @@ describe('schema', () => {
                 bar: string | null;
                 baz?: string | null;
             };
-            const schema: SchemaDef<T> = {
+            const schema = new Schema<T>({
                 type: 'object',
                 properties: {
                     foo: { type: 'string', optional: true },
                     bar: { type: 'string', nullable: true },
                     baz: { type: 'string', optional: true, nullable: true },
                 }
-            };
+            });
 
             it('applies defaults when unspecified', () => {
-                assert.deepStrictEqual(decode(schema, {}), {
+                assert.deepStrictEqual(schema.decode({}), {
                     bar: null,
                 });
             });
 
             it('omits invalid optionals', () => {
-                assert.deepStrictEqual(decode(schema, {
+                assert.deepStrictEqual(schema.decode({
                     foo: {},
                     bar: {},
                     baz: {}
@@ -209,7 +208,7 @@ describe('schema', () => {
                 children: Node[];
             }
 
-            const schema: SchemaDef<Node> = {
+            const schema = new Schema<Node>({
                 id: 'Node',
                 type: 'object',
                 properties: {
@@ -219,10 +218,10 @@ describe('schema', () => {
                         items: { type: 'ref', schemaId: 'Node' },
                     }
                 }
-            };
+            });
 
             it('decodes recursive objects', () => {
-                const decoded = decode(schema, {
+                const decoded = schema.decode({
                     data: 'foo',
                     children: [
                         { data: 'bar' },

@@ -1,5 +1,4 @@
 export * from './coerce';
-export * from './decode';
 export * from './schema';
 export * from './defaults';
 export * from './errors';

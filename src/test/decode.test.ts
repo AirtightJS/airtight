@@ -1,7 +1,5 @@
 import assert from 'assert';
 
-import { decode } from '../main/decode';
-import { SchemaDef } from '../main/schema-def';
 import { Schema } from '../main/schema.js';
 
 interface Product {
@@ -17,7 +15,7 @@ interface Price {
     currency: 'gbp' | 'eur' | 'usd';
 }
 
-const PriceSchema: SchemaDef<Price> = {
+const PriceSchema = new Schema<Price>({
     type: 'object',
     properties: {
         value: { type: 'integer' },
@@ -27,17 +25,17 @@ const PriceSchema: SchemaDef<Price> = {
             default: 'gbp',
         },
     },
-};
+});
 
-const ProductSchema: SchemaDef<Product> = {
+const ProductSchema = new Schema<Product>({
     type: 'object',
     properties: {
         title: {
             type: 'string',
             default: 'Unknown Product',
         },
-        price: PriceSchema,
-        salePrice: { ...PriceSchema, optional: true },
+        price: PriceSchema.schema,
+        salePrice: { ...PriceSchema.schema, optional: true },
         promoCode: {
             type: 'string',
             nullable: true,
@@ -49,7 +47,7 @@ const ProductSchema: SchemaDef<Product> = {
             }
         },
     }
-};
+});
 
 
 describe('decode', () => {
@@ -57,7 +55,7 @@ describe('decode', () => {
     describe('with defaults', () => {
 
         it('empty object', () => {
-            const product = decode(ProductSchema, {});
+            const product = ProductSchema.decode({});
             assert.deepStrictEqual(product, {
                 title: 'Unknown Product',
                 price: {
@@ -70,7 +68,7 @@ describe('decode', () => {
         });
 
         it('type coercion', () => {
-            const product = decode(ProductSchema, {
+            const product = ProductSchema.decode({
                 title: 42,
                 price: {
                     value: '42',
@@ -90,7 +88,7 @@ describe('decode', () => {
         });
 
         it('use default for invalid values', () => {
-            const price = decode(PriceSchema, {
+            const price = PriceSchema.decode({
                 value: 'foo',
                 currency: 'bar',
             });
@@ -106,7 +104,7 @@ describe('decode', () => {
 
         it('throws on invalid values', () => {
             try {
-                decode(PriceSchema, {
+                PriceSchema.decode({
                     value: 'foo',
                     currency: 'bar',
                 }, { throw: true });
