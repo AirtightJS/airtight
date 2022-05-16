@@ -1,6 +1,6 @@
 {
     "name": "airtight",
-    "version": "4.0.0",
+    "version": "4.0.1",
     "description": "JSON Schema inspired library for validating and decoding messages",
     "type": "module",
     "exports": {
