@@ -1,9 +1,9 @@
-import { coerce } from './coerce';
-import { defaults } from './defaults';
-import { DecodeError, ValidationError } from './errors';
-import { Schema } from './schema';
-import { ArraySchemaDef, NumberSchemaDef, ObjectSchemaDef, SchemaDef, SchemaDefType, StringSchemaDef } from './schema-def';
-import { getType } from './util';
+import { coerce } from './coerce.js';
+import { defaults } from './defaults.js';
+import { DecodeError, ValidationError } from './errors.js';
+import { Schema } from './schema.js';
+import { ArraySchemaDef, NumberSchemaDef, ObjectSchemaDef, SchemaDef, SchemaDefType, StringSchemaDef } from './schema-def.js';
+import { getType } from './util.js';
 
 export class DecodeJob<T> {
     errors: DecodeError[] = [];

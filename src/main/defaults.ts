@@ -1,4 +1,4 @@
-import { SchemaDefType } from './schema-def';
+import { SchemaDefType } from './schema-def.js';
 
 type DefaultsMap = {
     [K in SchemaDefType]: any;

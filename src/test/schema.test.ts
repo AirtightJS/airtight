@@ -1,7 +1,7 @@
 import assert from 'assert';
 
 import { Schema } from '../main/schema.js';
-import { SchemaRefs } from '../main/schema-def';
+import { SchemaRefs } from '../main/schema-def.js';
 
 describe('schema', () => {
 

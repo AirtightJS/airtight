@@ -1,7 +1,7 @@
 import assert from 'assert';
 
-import { coerce } from '../main/coerce';
-import { SchemaDefType } from '../main/schema-def';
+import { coerce } from '../main/coerce.js';
+import { SchemaDefType } from '../main/schema-def.js';
 
 describe('coerce', () => {
 

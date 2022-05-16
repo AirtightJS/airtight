@@ -1,5 +1,5 @@
-import { DecodeJob } from './decode';
-import { SchemaDef } from './schema-def';
+import { DecodeJob } from './decode.js';
+import { SchemaDef } from './schema-def.js';
 import { DeepPartial } from './util.js';
 
 export class Schema<T> {

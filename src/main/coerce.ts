@@ -1,5 +1,5 @@
-import { SchemaDefType } from './schema-def';
-import { DataType, getType } from './util';
+import { SchemaDefType } from './schema-def.js';
+import { DataType, getType } from './util.js';
 
 type CoercionMap = {
     [P in SchemaDefType]?: {

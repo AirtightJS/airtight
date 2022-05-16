@@ -1,6 +1,6 @@
 import { Exception } from 'typesafe-exception';
 
-import { SchemaDef } from './schema-def';
+import { SchemaDef } from './schema-def.js';
 
 export class ValidationError extends Exception<{ errors: DecodeError[] }> {
     status = 400;
