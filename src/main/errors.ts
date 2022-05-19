@@ -1,15 +1,18 @@
-import { Exception } from 'typesafe-exception';
-
 import { SchemaDef } from './schema-def.js';
 
-export class ValidationError extends Exception<{ errors: DecodeError[] }> {
+export class ValidationError extends Error {
     status = 400;
+    details: { errors: DecodeError[] };
 
     constructor(schema: SchemaDef, errors: DecodeError[]) {
-        super('ValidationError', { errors });
+        super();
         const msg = this.formatMessage(errors);
         const type = schema.id ?? schema.type;
         this.message = `${type} validation failed:\n${msg}`;
+        this.name = 'ValidationError';
+        this.details = {
+            errors,
+        };
     }
 
     protected formatMessage(errors: DecodeError[]) {
