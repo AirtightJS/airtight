@@ -3,11 +3,11 @@
     "version": "4.1.0",
     "description": "JSON Schema inspired library for validating and decoding messages",
     "type": "module",
-    "exports": {
-        "import": "./out/main/index.js"
-    },
     "main": "out/main/index.js",
     "types": "out/main/index.d.ts",
+    "exports": {
+        ".": "./out/main/index.js"
+    },
     "files": [
         "out/main/**/*"
     ],
