@@ -1,6 +1,7 @@
 import { SchemaDef } from './schema-def.js';
 
 export class ValidationError extends Error {
+    name = this.constructor.name;
     status = 400;
     details: { errors: DecodeError[] };
 
@@ -9,7 +10,6 @@ export class ValidationError extends Error {
         const msg = this.formatMessage(errors);
         const type = schema.id ?? schema.type;
         this.message = `${type} validation failed:\n${msg}`;
-        this.name = 'ValidationError';
         this.details = {
             errors,
         };
