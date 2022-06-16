@@ -1,4 +1,4 @@
-import { DecodeJob } from './decode.js';
+import { DecodeJob, DecodeOptions } from './decode.js';
 import { SchemaDef } from './schema-def.js';
 import { DeepPartial } from './util.js';
 
@@ -15,8 +15,8 @@ export class Schema<T> {
         return this.decode(partials);
     }
 
-    decode(value: unknown): T {
-        return new DecodeJob(this, value).decode();
+    decode(value: unknown, options: Partial<DecodeOptions> = {}): T {
+        return new DecodeJob(this, value, options).decode();
     }
 
     getRef(schemaId: string): SchemaDef | null {

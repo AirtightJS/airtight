@@ -5,18 +5,31 @@ import { Schema } from './schema.js';
 import { ArraySchemaDef, NumberSchemaDef, ObjectSchemaDef, SchemaDef, SchemaDefType, StringSchemaDef } from './schema-def.js';
 import { getType } from './util.js';
 
+export interface DecodeOptions {
+    throw: boolean;
+    strictRequired: boolean;
+}
+
 export class DecodeJob<T> {
+    options: DecodeOptions;
     errors: DecodeError[] = [];
 
     constructor(
-        readonly decoder: Schema<T>,
+        readonly schema: Schema<T>,
         readonly value: unknown,
-    ) {}
+        options: Partial<DecodeOptions> = {},
+    ) {
+        this.options = {
+            throw: true,
+            strictRequired: false,
+            ...options,
+        };
+    }
 
     decode(): T {
-        const res = this.decodeAny(this.decoder.schema, this.value, '');
-        if (this.errors.length > 0) {
-            throw new ValidationError(this.decoder.schema, this.errors);
+        const res = this.decodeAny(this.schema.schema, this.value, '');
+        if (this.options.throw && this.errors.length > 0) {
+            throw new ValidationError(this.schema.schema, this.errors);
         }
         return res;
     }
@@ -32,8 +45,9 @@ export class DecodeJob<T> {
                 return null;
             }
             value = this.defaultValue(schema);
-            // This used to be an option, but decided to remove it to make less room for interpretation
-            // this.errors.push({ path, message: 'must not be null' });
+            if (this.options.strictRequired && schema.default == null) {
+                this.errors.push({ path, message: 'must not be null' });
+            }
         }
         // Any Schema
         if (schema.type === 'any') {
@@ -136,7 +150,7 @@ export class DecodeJob<T> {
     }
 
     protected decodeRef(schemaId: string, value: unknown, path: string): any {
-        const refSchema = this.decoder.getRef(schemaId);
+        const refSchema = this.schema.getRef(schemaId);
         if (!refSchema) {
             this.errors.push({ path, message: `unknown type ${schemaId}` });
             return undefined;

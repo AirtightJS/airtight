@@ -104,4 +104,23 @@ describe('decode', () => {
 
     });
 
+    describe('strict required', () => {
+
+        it('throws if required fields are missing', () => {
+            try {
+                PriceSchema.decode({}, { strictRequired: true });
+                throw new Error('Unexpected success');
+            } catch (err: any) {
+                assert.strictEqual(err.name, 'ValidationError');
+                assert.deepStrictEqual(err.details.errors, [{ path: '.value', message: 'must not be null' }]);
+            }
+        });
+
+        it('does not throw if schema default is specified', () => {
+            const price = PriceSchema.decode({ value: 123 }, { strictRequired: true });
+            assert.deepStrictEqual(price, { value: 123, currency: 'gbp' });
+        });
+
+    });
+
 });
