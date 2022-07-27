@@ -75,9 +75,10 @@ describe('coerce', () => {
         testCase('string', 42, '42');
         testCase('string', 'something', 'something');
         testCase('string', '42', '42');
-        testCase('string', { foo: 123 }, undefined);
+        testCase('string', { foo: 123 }, '{"foo":123}');
         testCase('string', [], undefined);
         testCase('string', ['foo'], 'foo');
+        testCase('string', new URL('https://example.com/'), 'https://example.com/');
     });
 
     describe('to object', () => {

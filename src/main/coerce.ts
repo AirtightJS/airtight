@@ -41,6 +41,7 @@ const STATIC_COERCIONS: CoercionMap = {
         null: (_: null) => '',
         number: (val: number) => val.toString(),
         boolean: (val: boolean) => val.toString(),
+        object: (val: object) => objectToString(val),
     },
     array: {
         'null': (_: null) => undefined,
@@ -65,4 +66,11 @@ export function coerce(desiredType: SchemaDefType, value: unknown): any | undefi
         }
     }
     return undefined;
+}
+
+export function objectToString(val: object) {
+    if (val.toString === Object.prototype.toString) {
+        return JSON.stringify(val);
+    }
+    return val.toString();
 }

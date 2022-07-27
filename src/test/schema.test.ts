@@ -165,16 +165,16 @@ describe('schema', () => {
 
         context('nullable, optional', () => {
             type T = {
-                foo?: string;
-                bar: string | null;
-                baz?: string | null;
+                foo?: number;
+                bar: number | null;
+                baz?: number | null;
             };
             const schema = new Schema<T>({
                 type: 'object',
                 properties: {
-                    foo: { type: 'string', optional: true },
-                    bar: { type: 'string', nullable: true },
-                    baz: { type: 'string', optional: true, nullable: true },
+                    foo: { type: 'number', optional: true },
+                    bar: { type: 'number', nullable: true },
+                    baz: { type: 'number', optional: true, nullable: true },
                 }
             });
 
