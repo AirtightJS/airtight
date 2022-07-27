@@ -15,5 +15,5 @@ export function getType(value: unknown): DataType {
 }
 
 export type DeepPartial<T> = {
-    [P in keyof T]?: DeepPartial<T[P]>;
+    [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
 };
