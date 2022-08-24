@@ -36,6 +36,10 @@ export class DecodeJob<T> {
 
     protected decodeAny<T>(schema: SchemaDef<T>, value: unknown, path: string) {
         const untypedSchema: SchemaDef<unknown> = schema;
+        // Any Schema
+        if (schema.type === 'any') {
+            return value;
+        }
         // Null/Undefined
         if (value == null) {
             if (untypedSchema.optional) {
@@ -48,10 +52,6 @@ export class DecodeJob<T> {
             if (this.options.strictRequired && schema.default == null) {
                 this.errors.push({ path, message: 'must not be null' });
             }
-        }
-        // Any Schema
-        if (schema.type === 'any') {
-            return value;
         }
         // Ref Schema
         if (schema.type === 'ref') {
