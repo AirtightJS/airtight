@@ -6,11 +6,15 @@ JSON Schema inspired library for validating and decoding messages.
 
 ## Key features
 
+- 🔥 Zero dependencies
 - 👗 Very slim — about 4KB minified, few hundred bytes gzipped
 - ⚡️ Blazing fast
+- 💻 Works in browser
+- 🗜 Tidy and compact
+- 🌳 Ergonomic
+- 🔬 Strongly typed
+- 💎 Very strict feature set
 - 🔨 Simple and well defined, gets the job done
-- 🗜 Very strict feature set
-- 🔬 100% type safe
 
 ## Why?
 

@@ -1,7 +1,7 @@
 {
-    "name": "airtight",
-    "version": "4.3.3",
-    "description": "JSON Schema inspired library for validating and decoding messages",
+    "name": "@flexent/schema",
+    "version": "0.0.0",
+    "description": "JSON Schema inspired library for validation, decoding and type conversion",
     "type": "module",
     "main": "out/main/index.js",
     "types": "out/main/index.d.ts",
@@ -26,7 +26,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com/inca/airtight.git"
+        "url": "git+ssh://git@github.com/flexent/schema.git"
     },
     "keywords": [
         "schema",
