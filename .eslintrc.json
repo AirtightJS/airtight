@@ -1,5 +1,19 @@
 {
     "extends": [
         "@flexent/eslint-config"
-    ]
+    ],
+    "rules": {
+        "@typescript-eslint/indent": [
+            2,
+            4,
+            {
+                "ignoredNodes": [ "PropertyDefinition[decorators]", "TSUnionType", "TSIntersectionType", "TSConditionalType", "TSTypeReference"
+                ],
+                "SwitchCase": 1,
+                "FunctionExpression": {
+                    "parameters": "off"
+                }
+            }
+        ]
+    }
 }

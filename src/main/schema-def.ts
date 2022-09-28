@@ -2,7 +2,7 @@ export type SchemaDef<T = unknown> =
     unknown extends T ? UnknownSchemaDef : (
         (StrictSchemaDef<T> | AnySchemaDef | RefSchemaDef) &
         (undefined extends T ? { optional: true } : {}) &
-        (null extends T ? { nullable: true } : {}) &
+       (null extends T ? { nullable: true } : {}) &
         BaseSchemaDef<T>
     );
 
@@ -16,7 +16,7 @@ export type StrictSchemaDef<T> = (
     T extends string ? StringSchemaDef :
     T extends Array<infer P> ? ArraySchemaDef<P>:
     T extends object ? ObjectSchemaDef<T> :
-    never
+        never
 );
 
 export type UnknownSchemaDef = (
