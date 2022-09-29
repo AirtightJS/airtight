@@ -6,7 +6,7 @@ import { ArraySchemaDef, NumberSchemaDef, ObjectSchemaDef, SchemaDef, SchemaDefT
 import { getType } from './util.js';
 
 export interface DecodeOptions {
-    throw: boolean;
+    ignoreErrors: boolean;
     strictRequired: boolean;
 }
 
@@ -20,7 +20,7 @@ export class DecodeJob<T> {
         options: Partial<DecodeOptions> = {},
     ) {
         this.options = {
-            throw: true,
+            ignoreErrors: false,
             strictRequired: false,
             ...options,
         };
@@ -28,7 +28,7 @@ export class DecodeJob<T> {
 
     decode(): T {
         const res = this.decodeAny(this.schema.schema, this.value, '');
-        if (this.options.throw && this.errors.length > 0) {
+        if (this.errors.length > 0 && !this.options.ignoreErrors) {
             throw new ValidationError(this.schema.schema, this.errors);
         }
         return res;
