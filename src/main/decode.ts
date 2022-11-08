@@ -120,7 +120,7 @@ export class DecodeJob<T> {
         const propKeys = new Set<string>();
         const result: any = {};
         const original: any = value;
-        for (const [key, propSchema] of Object.entries(schema.properties)) {
+        for (const [key, propSchema] of Object.entries(schema.properties || {})) {
             const value = original[key];
             const decoded = this.decodeAny(propSchema as SchemaDef<any>, value, `${path}.${key}`);
             if (decoded !== undefined) {
