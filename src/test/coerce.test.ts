@@ -82,8 +82,9 @@ describe('coerce', () => {
     });
 
     describe('to object', () => {
-        testCase('object', undefined, undefined);
-        testCase('object', null, undefined);
+        testCase('object', undefined, {});
+        testCase('object', null, {});
+        testCase('object', '', {});
         testCase('object', false, undefined);
         testCase('object', true, undefined);
         testCase('object', 42, undefined);
@@ -95,8 +96,8 @@ describe('coerce', () => {
     });
 
     describe('to array', () => {
-        testCase('array', undefined, undefined);
-        testCase('array', null, undefined);
+        testCase('array', undefined, []);
+        testCase('array', null, []);
         testCase('array', false, [false]);
         testCase('array', true, [true]);
         testCase('array', 42, [42]);

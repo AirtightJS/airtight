@@ -37,6 +37,10 @@ const STATIC_COERCIONS: CoercionMap = {
         },
         boolean: (val: boolean) => val ? 1 : 0,
     },
+    object: {
+        null: (_: null) => ({}),
+        string: (_: string) => stringToObject(_),
+    },
     string: {
         null: (_: null) => '',
         number: (val: number) => val.toString(),
@@ -44,7 +48,8 @@ const STATIC_COERCIONS: CoercionMap = {
         object: (val: object) => objectToString(val),
     },
     array: {
-        'null': (_: null) => undefined,
+        null: (_: null) => [],
+        string: (_: string) => _ === '' ? [] : [_],
         '*': (val: unknown) => [val],
     }
 };
@@ -73,4 +78,16 @@ export function objectToString(val: object) {
         return JSON.stringify(val);
     }
     return val.toString();
+}
+
+export function stringToObject(val: string) {
+    if (val === '') {
+        return {};
+    }
+    if (val.trim()[0] === '{') {
+        try {
+            return JSON.parse(val);
+        } catch (error) {}
+    }
+    return undefined;
 }
