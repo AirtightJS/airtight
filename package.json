@@ -1,6 +1,6 @@
 {
     "name": "@flexent/schema",
-    "version": "5.1.1",
+    "version": "5.2.0",
     "description": "JSON Schema inspired library for validation, decoding and type conversion",
     "type": "module",
     "main": "out/main/index.js",
