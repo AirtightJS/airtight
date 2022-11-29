@@ -1,6 +1,6 @@
 {
     "extends": [
-        "@flexent/eslint-config"
+        "@nodescript/eslint-config"
     ],
     "rules": {
         "@typescript-eslint/indent": [
