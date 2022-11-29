@@ -1,6 +1,6 @@
 {
     "name": "@nodescript/schema",
-    "version": "5.2.0",
+    "version": "5.2.1",
     "description": "JSON Schema inspired library for validation, decoding and type conversion",
     "type": "module",
     "main": "out/main/index.js",
