@@ -1,5 +1,5 @@
 {
-    "name": "@flexent/schema",
+    "name": "@nodescript/schema",
     "version": "5.2.0",
     "description": "JSON Schema inspired library for validation, decoding and type conversion",
     "type": "module",
@@ -26,7 +26,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com/flexent/schema.git"
+        "url": "git+ssh://git@github.com/nodescript/schema.git"
     },
     "keywords": [
         "schema",
@@ -37,7 +37,7 @@
     "author": "Boris Okunskiy",
     "license": "ISC",
     "devDependencies": {
-        "@flexent/eslint-config": "^1.0.2",
+        "@nodescript/eslint-config": "^1.0.2",
         "@types/mocha": "^8.2.3",
         "@types/node": "^16.3.1",
         "eslint": "^8.24.0",
