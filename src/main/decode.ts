@@ -42,6 +42,10 @@ export class DecodeJob<T> {
         }
         // Null/Undefined
         if (value == null) {
+            // eslint-disable-next-line eqeqeq
+            if (untypedSchema.nullable && value === null) {
+                return null;
+            }
             if (untypedSchema.optional) {
                 return undefined;
             }
