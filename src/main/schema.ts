@@ -1,5 +1,5 @@
 import { DecodeJob, DecodeOptions } from './decode.js';
-import { ValidationError } from './errors.js';
+import { DecodeError } from './errors.js';
 import { SchemaDef } from './schema-def.js';
 import { DeepPartial } from './util.js';
 
@@ -20,16 +20,10 @@ export class Schema<T> {
         return new DecodeJob(this, value, options).decode();
     }
 
-    isValid(value: unknown) {
-        try {
-            new DecodeJob(this, value).decode();
-            return true;
-        } catch (error) {
-            if (error instanceof ValidationError) {
-                return false;
-            }
-            throw error;
-        }
+    validate(value: unknown): DecodeError[] {
+        const job = new DecodeJob(this, value, { ignoreErrors: true });
+        job.decode();
+        return job.errors;
     }
 
     getRef(schemaId: string): SchemaDef | null {
