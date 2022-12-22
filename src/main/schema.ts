@@ -1,4 +1,5 @@
 import { DecodeJob, DecodeOptions } from './decode.js';
+import { ValidationError } from './errors.js';
 import { SchemaDef } from './schema-def.js';
 import { DeepPartial } from './util.js';
 
@@ -17,6 +18,18 @@ export class Schema<T> {
 
     decode(value: unknown, options: Partial<DecodeOptions> = {}): T {
         return new DecodeJob(this, value, options).decode();
+    }
+
+    isValid(value: unknown) {
+        try {
+            new DecodeJob(this, value).decode();
+            return true;
+        } catch (error) {
+            if (error instanceof ValidationError) {
+                return false;
+            }
+            throw error;
+        }
     }
 
     getRef(schemaId: string): SchemaDef | null {
