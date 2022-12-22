@@ -6,6 +6,7 @@ import { SchemaRefs } from '../main/schema-def.js';
 describe('schema', () => {
 
     describe('type: boolean', () => {
+
         it('coerce from basic types', () => {
             assert.strictEqual(new Schema<boolean>({ type: 'boolean' }).decode('false'), false);
             assert.strictEqual(new Schema<boolean>({ type: 'boolean' }).decode('true'), true);
@@ -16,9 +17,32 @@ describe('schema', () => {
             assert.throws(() => new Schema<boolean>({ type: 'boolean' }).decode('foo'));
             assert.throws(() => new Schema<boolean>({ type: 'boolean', default: true }).decode('foo'));
         });
+
+    });
+
+    describe('type: string', () => {
+
+        it('coerce from basic types', () => {
+            assert.strictEqual(new Schema<string>({ type: 'string' }).decode(true), 'true');
+            assert.strictEqual(new Schema<string>({ type: 'string' }).decode(42), '42');
+            assert.strictEqual(new Schema<string>({ type: 'string' }).decode(42.5), '42.5');
+        });
+
+        it('throws on invalid values', () => {
+            assert.throws(() => new Schema<string>({ type: 'string', enum: ['a', 'b'] }).decode('foo'));
+        });
+
+        it('users default', () => {
+            assert.strictEqual(
+                new Schema<string>({ type: 'string', enum: ['a', 'b'], default: 'a' }).decode(undefined),
+                'a'
+            );
+        });
+
     });
 
     describe('type: number', () => {
+
         it('coerce from basic types', () => {
             assert.strictEqual(new Schema<number>({ type: 'number' }).decode(true), 1);
             assert.strictEqual(new Schema<number>({ type: 'number' }).decode('42'), 42);
@@ -30,9 +54,11 @@ describe('schema', () => {
             assert.throws(() => new Schema<number>({ type: 'number' }).decode('false'));
             assert.throws(() => new Schema<number>({ type: 'number', default: 42 }).decode('foo'));
         });
+
     });
 
     describe('type: integer', () => {
+
         it('coerce from basic types', () => {
             assert.strictEqual(new Schema<number>({ type: 'integer' }).decode(true), 1);
             assert.strictEqual(new Schema<number>({ type: 'integer' }).decode('42'), 42);
@@ -82,6 +108,33 @@ describe('schema', () => {
                     baz: false,
                 });
             });
+        });
+
+        context('properties with default', () => {
+            type T = {
+                foo: 'a' | 'b';
+            };
+            const schema = new Schema<T>({
+                type: 'object',
+                properties: {
+                    foo: {
+                        type: 'string',
+                        enum: ['a', 'b'],
+                        default: 'a',
+                    },
+                }
+            });
+
+            it('uses default when property not included', () => {
+                assert.deepStrictEqual(schema.decode({}), {
+                    foo: 'a'
+                });
+            });
+
+            it('throws if value is incorrect', () => {
+                assert.throws(() => schema.decode({ foo: 'c' }));
+            });
+
         });
 
         context('additional properties', () => {
