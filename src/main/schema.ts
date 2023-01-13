@@ -12,11 +12,11 @@ export class Schema<T> {
         this.schema = schema;
     }
 
-    create(partials: DeepPartial<T>): T {
-        return this.decode(partials);
+    create(partials: DeepPartial<T>, options: Partial<DecodeOptions> = { strictRequired: false }): T {
+        return this.decode(partials, options);
     }
 
-    decode(value: unknown, options: Partial<DecodeOptions> = {}): T {
+    decode(value: unknown, options: Partial<DecodeOptions> = { strictRequired: false }): T {
         return new DecodeJob(this, value, options).decode();
     }
 
