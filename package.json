@@ -1,6 +1,6 @@
 {
     "name": "airtight",
-    "version": "5.3.0",
+    "version": "5.3.1",
     "description": "JSON Schema inspired library for validation, decoding and type conversion",
     "type": "module",
     "main": "out/main/index.js",
