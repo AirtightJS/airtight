@@ -3,7 +3,13 @@ import { DecodeError } from './errors.js';
 import { SchemaDef } from './schema-def.js';
 import { DeepPartial } from './util.js';
 
-export class Schema<T> {
+export interface SchemaLike<T> {
+    create(partials: DeepPartial<T>, options: Partial<DecodeOptions>): T;
+    decode(value: unknown, options: Partial<DecodeOptions>): T;
+    validate(value: unknown): DecodeError[];
+}
+
+export class Schema<T> implements SchemaLike<T> {
     readonly schema: SchemaDef<T>;
 
     protected _refs: Map<string, SchemaDef> | null = null;
