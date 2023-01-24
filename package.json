@@ -3,6 +3,7 @@
     "version": "5.3.1",
     "description": "JSON Schema inspired library for validation, decoding and type conversion",
     "type": "module",
+    "sideEffects": false,
     "main": "out/main/index.js",
     "types": "out/main/index.d.ts",
     "exports": {
