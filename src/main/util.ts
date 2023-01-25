@@ -17,7 +17,12 @@ export function getType(value: unknown): DataType {
     return 'any';
 }
 
-export function getDefaultValue(schema: { type: SchemaDefType; default?: any; optional?: true; nullable?: true }) {
+export function getDefaultValue(schema: {
+    type: SchemaDefType;
+    default?: any;
+    optional?: boolean;
+    nullable?: boolean;
+}) {
     if (typeof schema.default === 'function') {
         return schema.default();
     }
