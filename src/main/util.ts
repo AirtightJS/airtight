@@ -1,3 +1,6 @@
+import { defaults } from './defaults.js';
+import { SchemaDefType } from './schema-def.js';
+
 export type DataType = 'string' | 'boolean' | 'number' | 'object' | 'array' | 'any' | 'null';
 
 export function getType(value: unknown): DataType {
@@ -12,6 +15,13 @@ export function getType(value: unknown): DataType {
         return type;
     }
     return 'any';
+}
+
+export function getDefaultValue(schema: { type: SchemaDefType; default?: any; optional?: true; nullable?: true }) {
+    if (typeof schema.default === 'function') {
+        return schema.default();
+    }
+    return schema.default ?? (schema.optional ? undefined : schema.nullable ? null : defaults[schema.type]);
 }
 
 export type DeepPartial<T> = {

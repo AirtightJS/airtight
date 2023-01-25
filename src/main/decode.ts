@@ -1,9 +1,8 @@
 import { coerce } from './coerce.js';
-import { defaults } from './defaults.js';
 import { DecodeError, ValidationError } from './errors.js';
 import { Schema } from './schema.js';
 import { ArraySchemaDef, NumberSchemaDef, ObjectSchemaDef, SchemaDef, SchemaDefType, StringSchemaDef } from './schema-def.js';
-import { getType } from './util.js';
+import { getDefaultValue, getType } from './util.js';
 
 export interface DecodeOptions {
     ignoreErrors: boolean;
@@ -163,11 +162,7 @@ export class DecodeJob<T> {
     }
 
     protected defaultValue(schema: { type: SchemaDefType; default?: any; optional?: true; nullable?: true }) {
-        const schemaDefault = schema.default;
-        if (typeof schemaDefault === 'function') {
-            return schemaDefault();
-        }
-        return schemaDefault ?? (schema.optional ? undefined : schema.nullable ? null : defaults[schema.type]);
+        return getDefaultValue(schema);
     }
 
 }
