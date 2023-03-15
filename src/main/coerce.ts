@@ -38,7 +38,7 @@ const STATIC_COERCIONS: CoercionMap = {
         boolean: (val: boolean) => val ? 1 : 0,
     },
     object: {
-        null: (_: null) => Object.create(null),
+        null: (_: null) => {},
         string: (_: string) => stringToObject(_),
     },
     string: {
