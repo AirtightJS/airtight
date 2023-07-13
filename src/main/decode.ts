@@ -116,6 +116,14 @@ export class DecodeJob<T> {
                 valid = false;
             }
         }
+        if (schema.minLength != null && str.length < schema.minLength) {
+            this.errors.push({ path, message: `must be at least ${schema.minLength} characters` });
+            valid = false;
+        }
+        if (schema.maxLength != null && str.length > schema.maxLength) {
+            this.errors.push({ path, message: `must not exceed ${schema.maxLength} characters` });
+            valid = false;
+        }
         return valid ? str : this.defaultValue(schema);
     }
 

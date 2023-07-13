@@ -60,6 +60,8 @@ export type StringSchemaDef = {
     regex?: string;
     regexFlags?: string;
     enum?: string[];
+    minLength?: number;
+    maxLength?: number;
 };
 
 export type ObjectSchemaDef<T> = {

@@ -38,7 +38,7 @@ const STATIC_COERCIONS: CoercionMap = {
         boolean: (val: boolean) => val ? 1 : 0,
     },
     object: {
-        null: (_: null) => {},
+        null: (_: null) => ({}),
         string: (_: string) => stringToObject(_),
     },
     string: {
@@ -83,11 +83,6 @@ export function objectToString(val: object) {
 export function stringToObject(val: string) {
     if (val === '') {
         return {};
-    }
-    if (val.trim()[0] === '{') {
-        try {
-            return JSON.parse(val);
-        } catch (error) {}
     }
     return undefined;
 }

@@ -112,6 +112,7 @@ describe('coerce', () => {
 
 function testCase(desiredType: SchemaDefType, value: unknown, expectedValue: any) {
     it(`${JSON.stringify(value)} -> ${JSON.stringify(expectedValue)}`, () => {
-        assert.deepStrictEqual(coerce(desiredType, value), expectedValue);
+        const coercedValue = coerce(desiredType, value);
+        assert.deepStrictEqual(coercedValue, expectedValue);
     });
 }

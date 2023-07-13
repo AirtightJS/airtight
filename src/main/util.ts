@@ -26,6 +26,11 @@ export function getDefaultValue(schema: {
     if (typeof schema.default === 'function') {
         return schema.default();
     }
+    if (typeof schema.default === 'string') {
+        try {
+            return JSON.parse(schema.default);
+        } catch (error) {}
+    }
     return schema.default ?? (schema.optional ? undefined : schema.nullable ? null : defaults[schema.type]);
 }
 
