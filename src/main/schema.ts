@@ -26,8 +26,8 @@ export class Schema<T> implements SchemaLike<T> {
         return new DecodeJob(this, value, options).decode();
     }
 
-    validate(value: unknown): DecodeError[] {
-        const job = new DecodeJob(this, value, { ignoreErrors: true });
+    validate(value: unknown, options: Partial<DecodeOptions> = { strictRequired: false }): DecodeError[] {
+        const job = new DecodeJob(this, value, { ...options, ignoreErrors: true });
         job.decode();
         return job.errors;
     }
