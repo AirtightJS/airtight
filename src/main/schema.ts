@@ -4,9 +4,9 @@ import { SchemaDef } from './schema-def.js';
 import { DeepPartial } from './util.js';
 
 export interface SchemaLike<T> {
-    create(partials: DeepPartial<T>, options: Partial<DecodeOptions>): T;
-    decode(value: unknown, options: Partial<DecodeOptions>): T;
-    validate(value: unknown): DecodeError[];
+    create(partials: DeepPartial<T>, options?: Partial<DecodeOptions>): T;
+    decode(value: unknown, options?: Partial<DecodeOptions>): T;
+    validate(value: unknown, options?: Partial<DecodeOptions>): DecodeError[];
 }
 
 export class Schema<T> implements SchemaLike<T> {
